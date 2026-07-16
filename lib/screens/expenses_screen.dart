@@ -97,7 +97,39 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               onPressed: _addExpense,
               child: const Text("Add Expense"),
             ),
-            
+            const SizedBox(height: 20),
+
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Expenses",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            Expanded(
+              child: ListView.builder(
+                itemCount: _expenses.length,
+                itemBuilder: (context, index){
+                  Expense expense = _expenses[index];
+
+                  return Card(
+                    child: ListTile(
+                      leading: const Icon(Icons.money_off),
+                      title: Text(expense.title),
+                      subtitle: Text(expense.category),
+                      trailing: Text(
+                        "\$${expense.amount}"
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
           ],
         ),
       ),
