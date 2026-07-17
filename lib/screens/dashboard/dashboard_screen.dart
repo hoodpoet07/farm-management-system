@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../widgets/dashboard_card.dart';
 import '../expenses/expenses_screen.dart';
-import '../purchases_screen.dart';
-import '../sales_screen.dart';
-import '../settings_screen.dart';
-import '../feed_usage_screen.dart';
-import '../reports_screen.dart';
-import '../feed_inventory.dart';
+import '../purchases/purchases_screen.dart';
+import '../sales/sales_screen.dart';
+import '../settings/settings_screen.dart';
+import '../feed/feed_usage_screen.dart';
+import '../reports/reports_screen.dart';
+import '../feed/feed_inventory.dart';
 class DashboardScreen extends StatelessWidget{
   const DashboardScreen({super.key});
 
