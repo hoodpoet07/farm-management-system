@@ -125,7 +125,13 @@ class DashboardScreen extends StatelessWidget{
                 );
               },
               ),
-              
+            DashboardCard(
+              icon: Icons.smart_toy_outlined,
+              title: "AI Assistant",
+              onTap: (){
+                 
+              },
+              ),
           ],
         ),
       ),

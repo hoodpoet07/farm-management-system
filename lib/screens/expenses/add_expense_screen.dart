@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/expense.dart';
+import '../../widgets/custom_dropdown.dart';
+import '../../widgets/custom_text_field.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   const AddExpenseScreen({super.key});
@@ -66,16 +68,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           key: _formKey,
           child: Column(
           children: [
-
-            TextFormField(
+            CustomTextField(
               controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: "Expense Title",
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.title),
-              ),
-              validator: (value){
-                if (value==null ||value.trim().isEmpty){
+              label: "Expense Title",
+              icon: Icons.title,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
                   return "Please enter an expense title";
                 }
                 return null;
@@ -84,31 +82,24 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
             const SizedBox(height: 15),
 
-            DropdownButtonFormField<String>(
+            CustomDropdown(
+              label: "category",
+              icon: Icons.category,
               value: _selectedCategory,
-              decoration: const InputDecoration(
-                labelText: "Category",
-                border: OutlineInputBorder(),
-                prefixIcon:Icon(Icons.category),
-              ),
-              items: _categories.map((category){
-                return DropdownMenuItem(
-                  value: category,
-                  child: Text(category),
-                );
-              }).toList(),
+              items: _categories,
               onChanged: (value){
-                setState((){
+                setState(() {
                   _selectedCategory=value;
                 });
               },
               validator: (value){
-                if (value==null || value.isEmpty){
+                if (value==null){
                   return "Please select a category";
                 }
                 return null;
               },
             ),
+
 
             const SizedBox(height: 10),
 
