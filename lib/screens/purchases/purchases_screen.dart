@@ -7,7 +7,7 @@ class PurchasesScreen extends StatelessWidget{
   Widget build(BuildContext context){
     return Scaffold(
       appBar:AppBar(
-        title: const Text("Expenses"),
+        title: const Text("Purchases"),
       ),
       body: const Center(
         child: Text(
