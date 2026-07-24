@@ -60,9 +60,12 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
 
                       Text(
                         "\$${expense.amount.toStringAsFixed(2)}",
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
+                          ),
+                      IconButton(
+                        icon: const Icon(Icons.edit),
+                        onPressed: () {
+                          _editExpense(expense);
+                        },
                       ),
 
                       IconButton(
@@ -118,7 +121,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
             ),
 
             ElevatedButton(
-              onPressed: () async{
+              onPressed: () async {
                 await DatabaseHelper.instance.deleteExpense(id);
                 Navigator.pop(context);
                 
@@ -131,5 +134,20 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
         );
       }
     );
+  }
+
+  Future<void> _editExpense(Expense expense) async{
+    final Expense? updatedExpense = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_)=>AddExpenseScreen(
+          expense: expense,
+        ),
+      ),
+    );
+    if (updatedExpense != null){
+      await DatabaseHelper.instance.updateExpense(updatedExpense);
+      _loadExpenses();
+    }
   }
 }

@@ -7,6 +7,7 @@ import '../settings/settings_screen.dart';
 import '../feed/feed_usage_screen.dart';
 import '../reports/reports_screen.dart';
 import '../feed/feed_inventory.dart';
+import '../ai/smart_farmer.dart';
 class DashboardScreen extends StatelessWidget{
   const DashboardScreen({super.key});
 
@@ -129,7 +130,12 @@ class DashboardScreen extends StatelessWidget{
               icon: Icons.smart_toy_outlined,
               title: "AI Assistant",
               onTap: (){
-                 
+                 Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context)=>const SmartFarmer(),
+                  ),
+                 );
               },
               ),
           ],

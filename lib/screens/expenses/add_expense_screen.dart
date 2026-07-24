@@ -152,8 +152,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
               child: ElevatedButton.icon(
                 onPressed: _saveExpense,
                 icon: const Icon(Icons.save),
-                label: const Text(
-                  "Save Expense",
+                label: Text(
+                  widget.expense==null
+                  ? "Save Expense"
+                  : "Update Expense",
                   style: TextStyle(fontSize: 18),
                 ),
               ),

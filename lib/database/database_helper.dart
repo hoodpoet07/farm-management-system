@@ -64,4 +64,15 @@ class DatabaseHelper{
       whereArgs: [id],
     );
   }
+
+  Future<int> updateExpense(Expense expense) async{
+    final db = await database;
+
+    return await db.update(
+      'expenses',
+      expense.toMap(),
+      where: 'id=?',
+      whereArgs: [expense.id],
+    );
+  }
 }
