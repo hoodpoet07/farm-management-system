@@ -4,7 +4,12 @@ import '../../widgets/custom_dropdown.dart';
 import '../../widgets/custom_text_field.dart';
 
 class AddExpenseScreen extends StatefulWidget {
-  const AddExpenseScreen({super.key});
+  final Expense? expense;
+
+  const AddExpenseScreen({
+    super.key,
+    this.expense,
+  });
 
   @override
   State<AddExpenseScreen> createState() => _AddExpenseScreenState();
@@ -42,6 +47,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     }
   
     Expense expense = Expense(
+      id: widget.expense?.id,
       title: _titleController.text,
       category: _selectedCategory!,
       amount: double.parse(_amountController.text),
@@ -50,10 +56,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     );
 
     Navigator.pop(context,expense);
-    
-  
-
-  }
+      }
 
   
   @override
@@ -160,5 +163,16 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       ),
       ),
     );
+  }
+  @override
+  void initState(){
+    super.initState();
+
+    if (widget.expense != null){
+      _titleController.text= widget.expense!.title;
+      _amountController.text=widget.expense!.amount.toString();
+      _descriptionController.text=widget.expense!.description;
+      _selectedCategory = widget.expense!.category;
+    }
   }
 }
