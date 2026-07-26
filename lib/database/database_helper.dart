@@ -1,6 +1,7 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/expense.dart';
+import '../models/purchase.dart';
 
 class DatabaseHelper{
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -13,12 +14,13 @@ class DatabaseHelper{
   }
   Future<Database> _initDatabase() async{
     final dbPath = await getDatabasesPath();
-    final path = join(dbPath, 'farm_managemnet.db');
+    final path = join(dbPath, 'farm_management.db');
 
     return await openDatabase(
         path,
-        version: 1,
+        version: 2,
         onCreate: _createDatabase,
+        onUpgrade: _upgradeDatabase,
     );
   }
   Future _createDatabase(Database db,int version) async {
@@ -31,6 +33,18 @@ class DatabaseHelper{
         description TEXT,
         date TEXT NOT NULL
         )
+''');
+
+    await db.execute('''
+    CREATE TABLE purchases(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      itemName TEXT NOT NULL,
+      supplier TEXT NOT NULL,
+      quantity INTEGER NOT NULL,
+      unitPrice REAL NOT NULL,
+      totalPrice REAL NOT NULL,
+      date TEXT NOT NULL
+      )
 ''');
   }
 
@@ -55,16 +69,6 @@ class DatabaseHelper{
     );
   }
 
-  Future<int> deleteExpense(int id) async{
-    final db = await database;
-
-    return await db.delete(
-      'expenses',
-      where: 'id=?',
-      whereArgs: [id],
-    );
-  }
-
   Future<int> updateExpense(Expense expense) async{
     final db = await database;
 
@@ -74,5 +78,78 @@ class DatabaseHelper{
       where: 'id=?',
       whereArgs: [expense.id],
     );
+  }
+
+  Future<int> deleteExpense(int id) async{
+    final db = await database;
+
+    return await db.delete(
+      'expenses',
+      where: 'id=?',
+      whereArgs: [id],
+    );
+  }
+  Future<int> insertPurchase(Purchase purchase) async{
+    final db = await database;
+
+    return await db.insert(
+      'purchases',
+      purchase.toMap(),
+    );
+  }
+
+  Future<List<Purchase>> getAllPurchases() async {
+    final db = await database;
+
+    final List<Map<String, dynamic>> maps =
+      await db.query('purchases');
+
+    return List.generate(
+      maps.length,
+      (index)=> Purchase.fromMap(maps[index]),
+    );
+  }
+
+  Future<int> updatePurchase(Purchase purchase) async {
+    final db = await database;
+
+    return await db.update(
+      'purchases',
+      purchase.toMap(),
+      where: 'id=?',
+      whereArgs: [purchase.id],
+    );
+  }
+
+  Future<int> deletePurchase(int id) async {
+    final db = await database;
+
+    return await db.delete(
+      'purchases',
+      where: 'id=?',
+      whereArgs: [id],
+    );
+  }
+  
+}
+
+Future<void> _upgradeDatabase(
+  Database db,
+  int oldVersion,
+  int newVersion,
+) async{
+  if (oldVersion<2){
+
+    await db.execute('''
+      CREATE TABLE purchases(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        itemName TEXT NOT NULL,
+        supplier TEXT NOT NULL,
+        quantity INTEGER NOT NULL,
+        unitPrice REAL NOT NULL,
+        totalPrice REAL NOT NULL,
+        date TEXT NOT NULL
+      )
+''');
   }
 }
