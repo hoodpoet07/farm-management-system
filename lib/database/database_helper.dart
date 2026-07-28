@@ -2,6 +2,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../models/expense.dart';
 import '../models/purchase.dart';
+import '../models/supplier.dart';
 
 class DatabaseHelper{
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -18,7 +19,7 @@ class DatabaseHelper{
 
     return await openDatabase(
         path,
-        version: 2,
+        version: 3,
         onCreate: _createDatabase,
         onUpgrade: _upgradeDatabase,
     );
@@ -46,6 +47,13 @@ class DatabaseHelper{
       date TEXT NOT NULL
       )
 ''');
+
+  await db.execute('''
+  CREATE TABLE suppliers(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT UNIQUE NOT NULL
+    )
+    ''');
   }
 
   Future<int> insertExpense(Expense expense) async{
@@ -130,7 +138,25 @@ class DatabaseHelper{
       whereArgs: [id],
     );
   }
-  
+  Future<int> insertSupplier(Supplier supplier) async{
+    final db =await database;
+
+    return await db.insert(
+      'suppliers',
+      supplier.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.ignore, 
+    );
+  }
+  Future<List<Supplier>> getAllSuppliers() async {
+    final db= await database;
+
+    final maps = await db.query(
+      'suppliers',
+      orderBy: 'name ASC',
+    );
+
+    return maps.map((e)=> Supplier.fromMap(e)).toList();
+  }
 }
 
 Future<void> _upgradeDatabase(
@@ -150,6 +176,14 @@ Future<void> _upgradeDatabase(
         totalPrice REAL NOT NULL,
         date TEXT NOT NULL
       )
+''');
+  }
+  if(oldVersion<3){
+    await db.execute('''
+      CREATE TABLE suppliers(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE NOT NULL
+        )
 ''');
   }
 }

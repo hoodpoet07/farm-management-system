@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'screens/dashboard/dashboard_screen.dart';
+import 'screens/login/login.dart';
 void main() {
   runApp(const FarmManagementApp());
 }
@@ -12,7 +12,7 @@ class FarmManagementApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Farm Management System',
-      home: const DashboardScreen(),
+      home: const LoginScreen(),
     );
   }
 }

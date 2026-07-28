@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/purchase.dart';
 import 'add_purchase_screen.dart';
+import '../../database/database_helper.dart';
 
 class PurchasesScreen extends StatefulWidget{
   const PurchasesScreen({super.key});
@@ -11,8 +12,13 @@ class PurchasesScreen extends StatefulWidget{
 }
 
 class _PurchasesScreenState extends State<PurchasesScreen> {
-  final List<Purchase> _purchases = [];
+  List<Purchase> _purchases = [];
 
+  @override
+  void initState(){
+    super.initState();
+    _loadPurchases();
+  }
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -60,16 +66,29 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
           },
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
+          onPressed: () async {
+            final Purchase? purchase = await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_)=> const AddPurchaseScreen(),
               ),
             );
+            
+            if (purchase != null){
+              await DatabaseHelper.instance.insertPurchase(purchase);
+              _loadPurchases();
+            }
           },
           child: const Icon(Icons.add),
         ),
     );
+  }
+  Future<void> _loadPurchases() async {
+    final purchases =
+      await DatabaseHelper.instance.getAllPurchases();
+
+    setState((){
+      _purchases = purchases;
+    });
   }
 }

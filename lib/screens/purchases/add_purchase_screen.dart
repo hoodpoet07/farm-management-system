@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../models/purchase.dart';
+import '../../models/supplier.dart';
+import '../../database/database_helper.dart';
 
 class AddPurchaseScreen extends StatefulWidget{
   const AddPurchaseScreen({super.key});
@@ -10,6 +12,9 @@ class AddPurchaseScreen extends StatefulWidget{
 }
 
 class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
+  List<Supplier> _suppliers = [];
+  Supplier? _selectedSupplier;
+
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _itemController = TextEditingController();
@@ -19,12 +24,75 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
   double _totalPrice =0;
   
+  Future<void> _showAddSupplierDialog() async {
+    final controller = TextEditingController();
+
+    await showDialog(
+      context: context,
+      builder: (context){
+        return AlertDialog(
+          title: const Text("Add Supplier"),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              labelText: "Supplier Name",
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: (){
+                Navigator.pop(context);
+              },
+              child: const Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                if (controller.text.trim().isEmpty) return;
+
+                final supplier = Supplier(
+                  name: controller.text.trim(),
+                );
+
+                await DatabaseHelper.instance.insertSupplier(supplier);
+                  Navigator.pop(context);
+
+                  await _loadSuppliers();
+
+                  final suppliers = await DatabaseHelper.instance.getAllSuppliers();
+
+                  final addedSupplier = suppliers.firstWhere(
+                    (s)=>s.name==controller.text.trim(),
+                  );
+
+                  setState((){
+                    _selectedSupplier = addedSupplier;
+                  });
+              },
+              child: const Text("Save"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+
+  Future<void> _loadSuppliers() async {
+    final suppliers = 
+      await DatabaseHelper.instance.getAllSuppliers();
+
+    setState((){
+      _suppliers = suppliers;
+    });
+  }
   @override
   void initState(){
     super.initState();
 
     _quantityController.addListener(_calculateTotal);
     _unitPriceController.addListener(_calculateTotal);
+
+    _loadSuppliers();
   }
 
   void _calculateTotal(){
@@ -52,7 +120,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
     Purchase purchase = Purchase(
        itemName: _itemController.text.trim(),
-       supplier: _supplierController.text.trim(),
+       supplier: _selectedSupplier!.name,
        quantity: int.parse(_quantityController.text),
        unitPrice: double.parse(_unitPriceController.text),
        totalPrice: _totalPrice,
@@ -88,16 +156,37 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
               const SizedBox(height: 15),
 
-              
-              CustomTextField(
-                controller: _supplierController,
-                label: "Supplier",
-                icon: Icons.business,
-                validator: (value){
-                  if (value==null||value.trim().isEmpty){
-                    return "Please enter the name of the supplier";
+              DropdownButtonFormField<Supplier>(
+                initialValue: _selectedSupplier,
+                decoration: const InputDecoration(
+                  labelText: "Supplier",
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.business),
+                ),
+                items: [
+                  ..._suppliers.map(
+                    (supplier) => DropdownMenuItem<Supplier>(
+                      value: supplier,
+                      child: Text(supplier.name),
+                    ),
+                  ),
+
+                  DropdownMenuItem<Supplier>(
+                    value: _addSupplierOption,
+                    child: Text("➕ Add New Supplier"),
+                  ),
+                ],
+                onChanged: (supplier) async {
+                  if (supplier == null) return;
+                                      
+                  if (supplier.id==-1){
+                    await _showAddSupplierDialog();
+                    return;
                   }
-                  return null;
+                    setState(() {
+                      _selectedSupplier = supplier;
+                    });
+                  
                 },
               ),
               const SizedBox(height: 15),
@@ -203,4 +292,10 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
       ),
     );
   }
+
+  final Supplier _addSupplierOption = Supplier(
+    id: -1,
+    name: "➕ Add New Supplier",
+  );
+ 
 }
