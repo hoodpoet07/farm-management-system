@@ -1,5 +1,9 @@
+import 'package:farm_management_system/screens/ai/smart_farmer.dart';
+import 'package:farm_management_system/screens/chicken/chicken_stock_screen.dart';
 import 'package:farm_management_system/screens/expenses/expenses_screen.dart';
+import 'package:farm_management_system/screens/feed/feed_inventory.dart';
 import 'package:farm_management_system/screens/purchases/purchases_screen.dart';
+import 'package:farm_management_system/screens/reports/reports_screen.dart';
 import 'package:farm_management_system/screens/sales/sales_screen.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/dashboard_card.dart';
@@ -108,25 +112,51 @@ class DashboardScreen extends StatelessWidget{
             ListTile(
               leading: const Icon(Icons.egg),
               title: const Text("Chicken Batches"),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context)=>ChickenStockScreen()
+                  ),
+                );
+              },
             ),
 
             ListTile(
               leading: const Icon(Icons.grass),
               title: const Text("Feed Inventory"),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context)=>FeedInventoryScreen()
+                  ),
+                );
+              },
             ),
 
             ListTile(
               leading: const Icon(Icons.bar_chart),
               title: const Text("Reports"),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context)=>ReportsScreen())
+                );
+              },
             ),
 
             ListTile(
               leading: const Icon(Icons.psychology),
               title: const Text("AI"),
-              onTap: () {},
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context)=>VirtualScreen() )
+                );
+              },
             ),
           ],
         ),

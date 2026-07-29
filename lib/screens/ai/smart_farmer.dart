@@ -1,28 +1,22 @@
 import 'package:flutter/material.dart';
 
-class SmartFarmer extends StatefulWidget{
-  const SmartFarmer ({super.key});
+class VirtualScreen extends StatelessWidget{
+  const VirtualScreen({super.key});
 
-  @override
-  State<SmartFarmer> createState() => _smartFarmer();
-
-}
-class _smartFarmer extends State<SmartFarmer>{
   @override
   Widget build(BuildContext context){
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Artificial Intelligence"),
+        title: const Text("AI"),
       ),
       body: const Center(
         child: Text(
-          "AI is not yet Available",
+          "AI Page",
           style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          )
+            fontSize: 24,
+          ),
         ),
-      )
+      ),
     );
   }
 }
