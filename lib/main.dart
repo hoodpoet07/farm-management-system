@@ -14,7 +14,7 @@ class FarmManagementApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Farm Management System',
-      home: const LoginScreen(),
+      home: const DashboardScreen(),
     );
   }
 }
