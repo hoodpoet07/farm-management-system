@@ -3,6 +3,8 @@ import 'package:sqflite/sqflite.dart';
 import '../models/expense.dart';
 import '../models/purchase.dart';
 import '../models/supplier.dart';
+import '../models/chicken_batch.dart';
+import '../models/mortality.dart';
 
 class DatabaseHelper{
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -64,7 +66,37 @@ class DatabaseHelper{
     arrivalDate TEXT NOT NULL
       );
 ''');
+
+  await db.execute('''
+    CREATE TABLE mortality(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    batchId INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    reason TEXT NOT NULL,
+    date TEXT NOT NULL
+);
+''');
   }
+
+  Future<int> insertChickenBatch(ChickenBatch batch) async {
+  final db = await database;
+
+  return await db.insert(
+    'chicken_batches',
+    batch.toMap(),
+  );
+  }
+
+  Future<List<ChickenBatch>> getAllChickenBatches() async {
+  final db = await database;
+
+  final maps = await db.query('chicken_batches');
+
+  return List.generate(
+    maps.length,
+    (index) => ChickenBatch.fromMap(maps[index]),
+  );
+  } 
 
   Future<int> insertExpense(Expense expense) async{
     final db = await database;
@@ -157,6 +189,7 @@ class DatabaseHelper{
       conflictAlgorithm: ConflictAlgorithm.ignore, 
     );
   }
+
   Future<List<Supplier>> getAllSuppliers() async {
     final db= await database;
 
@@ -167,6 +200,30 @@ class DatabaseHelper{
 
     return maps.map((e)=> Supplier.fromMap(e)).toList();
   }
+
+  Future<int> insertMortality(Mortality mortality) async {
+    final db = await database;
+
+    return await db.insert(
+      'mortality',
+      mortality.toMap(),
+    );
+  }
+
+  Future<List<Mortality>> getMortalityByBatch(int batchId) async {
+  final db = await database;
+
+  final maps = await db.query(
+    'mortality',
+    where: 'batchId = ?',
+    whereArgs: [batchId],
+  );
+
+  return List.generate(
+    maps.length,
+    (index) => Mortality.fromMap(maps[index]),
+  );
+}
 }
 
 Future<void> _upgradeDatabase(
