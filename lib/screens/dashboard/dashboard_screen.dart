@@ -6,15 +6,37 @@ import 'package:farm_management_system/screens/login/login.dart';
 import 'package:farm_management_system/screens/purchases/purchases_screen.dart';
 import 'package:farm_management_system/screens/reports/reports_screen.dart';
 import 'package:farm_management_system/screens/sales/sales_screen.dart';
+import 'package:farm_management_system/services/dashboard_service.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/dashboard_card.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../models/dashboard_summary.dart';
 
 
-class DashboardScreen extends StatelessWidget{
+class DashboardScreen extends StatefulWidget{
   const DashboardScreen({super.key});
   
+  @override
+  State<DashboardScreen> createState()=>
+    _DashboardScreenState();
+}
 
+class _DashboardScreenState extends State<DashboardScreen> {
+  
+  DashboardSummary? summary;
+
+  @override
+  void initState(){
+    super.initState();
+
+    _loadDashboard();
+  }
+
+  Future<void> _loadDashboard() async {
+    summary= await DashboardService().getSummary();
+
+    setState((){});
+  }
   String _getGreeting(){
     final hour=DateTime.now().hour;
 

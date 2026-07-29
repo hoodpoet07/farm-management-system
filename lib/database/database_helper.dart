@@ -35,7 +35,7 @@ class DatabaseHelper{
         date TEXT NOT NULL
         )
 ''');
-
+    
     await db.execute('''
     CREATE TABLE purchases(
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -54,6 +54,16 @@ class DatabaseHelper{
     name TEXT UNIQUE NOT NULL
     )
     ''');
+  await db.execute('''
+    CREATE TABLE chicken_batches(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    batchName TEXT NOT NULL,
+    breed TEXT NOT NULL,
+    quantity INTEGER NOT NULL,
+    costPerBird REAL NOT NULL,
+    arrivalDate TEXT NOT NULL
+      );
+''');
   }
 
   Future<int> insertExpense(Expense expense) async{
