@@ -3,7 +3,7 @@ class ChickenBatch{
   final String batchName;
   final String breed;
   final int quantity;
-  final String dateReceived;
+  final String arrivalDate;
   final double costPerBird;
 
   ChickenBatch({
@@ -11,7 +11,7 @@ class ChickenBatch{
     required this.batchName,
     required this.breed,
     required this.quantity,
-    required this.dateReceived,
+    required this.arrivalDate,
     required this.costPerBird,
   });
 
@@ -21,7 +21,7 @@ class ChickenBatch{
       'batchName': batchName,
       'breed': breed,
       'quantity': quantity,
-      'dateReceived': dateReceived,
+      'dateReceived': arrivalDate,
       'costPerBird': costPerBird,
     };
   }
@@ -32,7 +32,7 @@ class ChickenBatch{
       batchName: map['batchName'],
       breed: map['breed'],
       quantity: map['quantity'],
-      dateReceived: map['dateReceived'],
+      arrivalDate: map['dateReceived'],
       costPerBird: map['costPerBird'],
     );
   }

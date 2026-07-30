@@ -4,7 +4,13 @@ import '../../models/chicken_batch.dart';
 import '../../models/mortality.dart';
 
 class RecordMortalityScreen extends StatefulWidget {
-  const RecordMortalityScreen({super.key});
+
+  final ChickenBatch? batch;
+
+  const RecordMortalityScreen({
+    super.key,
+    this.batch
+  });
 
   @override
   State<RecordMortalityScreen> createState() =>
@@ -33,15 +39,16 @@ class _RecordMortalityScreenState
       mortality += record.quantity;
     }
 
-    int sold = 0;
+    int sold = await DatabaseHelper.instance.getTotalSoldByBatch(_selectedBatch!.id!);
 
     setState(() {
       _totalMortality = mortality;
       _totalSold = sold;
-
       _currentBirds=_selectedBatch!.quantity-mortality-sold;
     });
   }
+
+
 
   final TextEditingController _quantityController =
       TextEditingController();
@@ -70,7 +77,17 @@ class _RecordMortalityScreenState
 
     setState(() {
       _batches = batches;
+
+      if(widget.batch != null){
+        _selectedBatch = batches.firstWhere(
+          (b)=>b.id == widget.batch!.id,
+        );
+      }
     });
+
+    if (_selectedBatch !=null){
+      await _loadBatchStatistics();
+    }
   }
 
   @override
@@ -128,7 +145,7 @@ class _RecordMortalityScreenState
             children: [
 
               DropdownButtonFormField<ChickenBatch>(
-                value: _selectedBatch,
+                initialValue: _selectedBatch,
 
                 decoration: const InputDecoration(
                   labelText: "Chicken Batch",
@@ -282,7 +299,7 @@ class _RecordMortalityScreenState
               const SizedBox(height: 15),
 
               DropdownButtonFormField<String>(
-                value: _selectedReason,
+                initialValue: _selectedReason,
 
                 decoration: const InputDecoration(
                   labelText: "Reason",

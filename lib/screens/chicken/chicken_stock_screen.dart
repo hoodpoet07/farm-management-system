@@ -1,7 +1,10 @@
+import 'package:farm_management_system/screens/sales/sales_screen.dart';
 import 'package:flutter/material.dart';
 import '../../database/database_helper.dart';
 import '../../models/chicken_batch.dart';
 import 'add_chicken_batch_screen.dart';
+import 'record_mortality_screen.dart';
+import '../sales/sales_screen.dart';
 
 class ChickenStockScreen extends StatefulWidget {
   const ChickenStockScreen({super.key});
@@ -12,6 +15,7 @@ class ChickenStockScreen extends StatefulWidget {
 
 class _ChickenStockScreenState extends State<ChickenStockScreen> {
   List<ChickenBatch> _batches = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
@@ -20,10 +24,15 @@ class _ChickenStockScreenState extends State<ChickenStockScreen> {
   }
 
   Future<void> _loadBatches() async {
+    setState(() {
+      _isLoading=true;
+    });
+
     final batches = await DatabaseHelper.instance.getAllChickenBatches();
 
     setState(() {
-      _batches = batches;
+      _batches=batches;
+      _isLoading=false;
     });
   }
 
@@ -33,8 +42,9 @@ class _ChickenStockScreenState extends State<ChickenStockScreen> {
       appBar: AppBar(
         title: const Text("Chicken Stock"),
       ),
-
-      body: _batches.isEmpty
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          :_batches.isEmpty
           ? const Center(
               child: Text(
                 "No Chicken Batches Yet",
@@ -51,41 +61,92 @@ class _ChickenStockScreenState extends State<ChickenStockScreen> {
 
                 return Card(
                   margin: const EdgeInsets.all(10),
-                  child: ListTile(
-                    leading: const CircleAvatar(
-                      child: Icon(Icons.egg),
-                    ),
-
-                    title: Text(batch.batchName),
-
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Breed: ${batch.breed}"),
-                        Text("Quantity: ${batch.quantity} birds"),
-                        Text("Cost/Bird: \$${batch.costPerBird}"),
-                      ],
-                    ),
+                  elevation: 4,
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const CircleAvatar(
+                          child: Icon(Icons.egg),
+                        ),
+                        title: Text(batch.batchName),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 4),
+                            Text("Breed: ${batch.breed}"),
+                            Text("Quantity: ${batch.quantity} birds"),
+                            Text("Cost/Bird: \$${batch.costPerBird.toStringAsFixed(2)}"),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 1),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            TextButton.icon(
+                              onPressed: () {
+                                //batch edit
+                              },
+                              icon: const Icon(Icons.edit),
+                              label: const Text("Edit"),
+                            ),
+                            TextButton.icon(
+                              onPressed: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) =>  RecordMortalityScreen(
+                                      batch: batch,
+                                    ),
+                                  ),
+                                );
+                                _loadBatches();
+                              },
+                              icon: const Icon(
+                                Icons.warning,
+                                color: Colors.red,
+                              ),
+                              label: const Text("Mortality",style: TextStyle(color: Colors.red),),
+                            ),
+                            TextButton.icon(
+                              onPressed: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => RecordSaleScreen(batch: batch),
+                                    ),
+                                );
+                                _loadBatches();
+                              },
+                              icon: const Icon(
+                                Icons.sell,
+                                color: Colors.green,
+                              ),
+                              label: const Text("Sell", style: TextStyle(color: Colors.green)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
                 );
               },
             ),
-
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-
+      floatingActionButton: FloatingActionButton.extended(
+        icon: const Icon(Icons.add),
+        label: const Text("Add batch"),
         onPressed: () async {
-          final batch = await Navigator.push(
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (_) => const AddChickenBatchScreen(),
             ),
           );
-
-          if (batch != null) {
-            await DatabaseHelper.instance.insertChickenBatch(batch);
-            _loadBatches();
-          }
+        if (result==true){
+          await _loadBatches();
+        }
         },
       ),
     );
