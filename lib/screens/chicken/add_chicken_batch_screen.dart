@@ -44,7 +44,7 @@ class _AddChickenBatchScreenState extends State<AddChickenBatchScreen> {
       if (mounted){
       Navigator.pop(context, true);
       }
-    }catch(e, stack){
+    }catch(e){
       print(" the error is below this line");
       print(e);
     }
@@ -136,10 +136,10 @@ class _AddChickenBatchScreenState extends State<AddChickenBatchScreen> {
                 child: ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                   onPressed: _saveBatch,
-                  icon: const Icon(Icons.save),
+                  icon: const Icon(Icons.save, color: Colors.white,),
                   label: const Text(
                     "Save Batch",
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18,color: Colors.white),
                   ),
                 ),
               ),

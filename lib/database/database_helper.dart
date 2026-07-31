@@ -108,17 +108,19 @@ class DatabaseHelper{
     return List.generate(maps.length, (i) => Sale.fromMap(maps[i]));
   }
 
+  Future<double> getTotalSalesAmount() async {
+  final db = await database;
+  final result = await db.rawQuery('SELECT SUM(totalAmount) as total FROM sales');
+  return (result.first['total'] as num?)?.toDouble() ?? 0.0;
+  }
+
   Future<int> getTotalSoldByBatch(int batchId) async {
     final db = await database;
     final result = await db.rawQuery(
       'SELECT SUM(quantity) as total FROM sales WHERE batchId = ?',
       [batchId],
     );
-    
-    if (result.first['total'] != null) {
-      return result.first['total'] as int;
-    }
-    return 0;
+    return (result.first['total'] as num?)?.toInt() ?? 0;
   }
   Future<int> insertChickenBatch(ChickenBatch batch) async {
     final db = await database;
@@ -136,6 +138,21 @@ class DatabaseHelper{
       (index) => ChickenBatch.fromMap(maps[index]),
     );
   } 
+
+  Future<int> getTotalChickensCount() async {
+  final db = await database;
+  
+  final batchRes = await db.rawQuery('SELECT SUM(quantity) as total FROM chicken_batches');
+  final mortalityRes = await db.rawQuery('SELECT SUM(quantity) as total FROM mortality');
+  final salesRes = await db.rawQuery('SELECT SUM(quantity) as total FROM sales');
+
+  final totalBatches = (batchRes.first['total'] as num?)?.toInt() ?? 0;
+  final totalMortality = (mortalityRes.first['total'] as num?)?.toInt() ?? 0;
+  final totalSales = (salesRes.first['total'] as num?)?.toInt() ?? 0;
+
+  final remaining = totalBatches - totalMortality - totalSales;
+  return remaining < 0 ? 0 : remaining;
+  }
 
   Future<int> insertExpense(Expense expense) async{
     final db = await database;
@@ -155,6 +172,12 @@ class DatabaseHelper{
     );
   }
 
+  Future<double> getTotalExpensesAmount() async {
+  final db = await database;
+  final result = await db.rawQuery('SELECT SUM(amount) as total FROM expenses');
+  return (result.first['total'] as num?)?.toDouble() ?? 0.0;
+  }
+
   Future<int> updateExpense(Expense expense) async{
     final db = await database;
     return await db.update(
@@ -163,6 +186,11 @@ class DatabaseHelper{
       where: 'id=?',
       whereArgs: [expense.id],
     );
+  }
+  Future<double> getTotalPurchasesAmount() async {
+  final db = await database;
+  final result = await db.rawQuery('SELECT SUM(totalPrice) as total FROM purchases');
+  return (result.first['total'] as num?)?.toDouble() ?? 0.0;
   }
 
   Future<int> deleteExpense(int id) async{

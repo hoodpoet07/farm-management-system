@@ -21,7 +21,7 @@ class ChickenBatch{
       'batchName': batchName,
       'breed': breed,
       'quantity': quantity,
-      'dateReceived': arrivalDate,
+      'arrivalDate': arrivalDate,
       'costPerBird': costPerBird,
     };
   }
@@ -32,7 +32,7 @@ class ChickenBatch{
       batchName: map['batchName'],
       breed: map['breed'],
       quantity: map['quantity'],
-      arrivalDate: map['dateReceived'],
+      arrivalDate: map['arrivalDate'],
       costPerBird: map['costPerBird'],
     );
   }

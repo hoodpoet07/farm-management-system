@@ -4,7 +4,6 @@ import '../../database/database_helper.dart';
 import '../../models/chicken_batch.dart';
 import 'add_chicken_batch_screen.dart';
 import 'record_mortality_screen.dart';
-import '../sales/sales_screen.dart';
 
 class ChickenStockScreen extends StatefulWidget {
   const ChickenStockScreen({super.key});

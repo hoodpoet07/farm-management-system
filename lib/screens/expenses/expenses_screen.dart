@@ -83,7 +83,9 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               );
             },
           ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
+        icon: const Icon(Icons.add),
+        label: const Text("Add expense"),
         onPressed: () async {
           final Expense? expense = await Navigator.push(
             context,
@@ -97,7 +99,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
           _loadExpenses();
         }
       },
-        child: const Icon(Icons.add),
+       
       )
     );  
   }

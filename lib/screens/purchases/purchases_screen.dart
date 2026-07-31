@@ -65,7 +65,9 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
             );
           },
         ),
-        floatingActionButton: FloatingActionButton(
+        floatingActionButton: FloatingActionButton.extended(
+          icon: const Icon(Icons.add),
+          label: const Text("Add purchases"),
           onPressed: () async {
             final Purchase? purchase = await Navigator.push(
               context,
@@ -79,7 +81,6 @@ class _PurchasesScreenState extends State<PurchasesScreen> {
               _loadPurchases();
             }
           },
-          child: const Icon(Icons.add),
         ),
     );
   }

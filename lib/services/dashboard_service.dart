@@ -2,32 +2,18 @@ import '../database/database_helper.dart';
 import '../models/dashboard_summary.dart';
 
 class DashboardService {
-
-  Future<DashboardSummary> getSummary() async {
-
-    final expenses =
-        await DatabaseHelper.instance.getAllExpenses();
-
-    final purchases =
-        await DatabaseHelper.instance.getAllPurchases();
-
-    double totalExpenses = 0;
-
-    for (final expense in expenses) {
-      totalExpenses += expense.amount;
-    }
-
-    double totalPurchases = 0;
-
-    for (final purchase in purchases) {
-      totalPurchases += purchase.totalPrice;
-    }
+  
+    Future<DashboardSummary> getSummary() async {
+    final totalExpenses = await DatabaseHelper.instance.getTotalExpensesAmount();
+    final totalPurchases = await DatabaseHelper.instance.getTotalPurchasesAmount();
+    final chickens = await DatabaseHelper.instance.getTotalChickensCount();
+    final sales = await DatabaseHelper.instance.getTotalSalesAmount();
 
     return DashboardSummary(
       totalExpenses: totalExpenses,
-      totalSales: 0,
+      totalSales: sales,
       totalPurchases: totalPurchases,
-      totalChickens: 0,
+      totalChickens: chickens,
       feedRemaining: 0,
     );
   }

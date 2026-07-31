@@ -83,11 +83,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Icon(
                         Icons.agriculture,
                         size: 40,
-                        color: Colors.green,
+                        color: Color.fromRGBO(16, 6, 51, 1),
                       ),
                     ),
                     decoration: const BoxDecoration(
-                      color: Colors.green,
+                      color: Color.fromRGBO(16,6,51,1),
                     ),
                   ),
 
@@ -145,9 +145,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ChickenStockScreen()
+                          builder: (context) => const ChickenStockScreen(),
                         ),
-                      );
+                      ).then((_) => _loadDashboard());
                     },
                   ),
 
@@ -158,9 +158,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const FeedInventoryScreen()
+                          builder: (context) => const FeedInventoryScreen(),
                         ),
-                      );
+                      ).then((_) => _loadDashboard());
                     },
                   ),
 
@@ -171,9 +171,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const ReportsScreen()
-                        )
-                      );
+                          builder: (context) => const ReportsScreen(),
+                        ),
+                      ).then((_) => _loadDashboard());
                     },
                   ),
 
@@ -184,9 +184,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const VirtualScreen() 
-                        )
-                      );
+                          builder: (context) => const VirtualScreen(),
+                        ),
+                      ).then((_) => _loadDashboard());
                     },
                   ),
 
@@ -197,9 +197,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const LoginScreen() 
-                        )
-                      );
+                          builder: (context) => const LoginScreen(),
+                        ),
+                      ).then((_) => _loadDashboard());
                     },
                   ),
                 ],
@@ -308,7 +308,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   DashboardCard(
                     icon: Icons.shopping_cart,
                     title: "Purchases",
-                    value: "\$${summary?.totalExpenses != null ? summary!.totalExpenses.toStringAsFixed(2) : "0.00"}",
+                    value: "\$${summary?.totalPurchases != null ? summary!.totalPurchases.toStringAsFixed(2) : "0.00"}",
                     color: Colors.green,
                   ),
 
@@ -325,17 +325,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     value: "\$${summary?.totalExpenses != null ? summary!.totalExpenses.toStringAsFixed(2) : "0.00"}",
                     color: Colors.green,
                   ),
-
                 ],
               ),
             ),
-
           ],
         ),
       ),
     );
-          
   }
-
-
 }
