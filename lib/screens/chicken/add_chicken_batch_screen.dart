@@ -39,11 +39,14 @@ class _AddChickenBatchScreenState extends State<AddChickenBatchScreen> {
       costPerBird: double.parse(_costController.text),
       arrivalDate: DateTime.now().toIso8601String(),
     );
-
-    await DatabaseHelper.instance.insertChickenBatch(batch);
-
-    if (mounted){
-    Navigator.pop(context, true);
+    try{
+      await DatabaseHelper.instance.insertChickenBatch(batch);
+      if (mounted){
+      Navigator.pop(context, true);
+      }
+    }catch(e, stack){
+      print(" the error is below this line");
+      print(e);
     }
   }
 
@@ -131,6 +134,7 @@ class _AddChickenBatchScreenState extends State<AddChickenBatchScreen> {
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
                   onPressed: _saveBatch,
                   icon: const Icon(Icons.save),
                   label: const Text(

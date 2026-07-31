@@ -15,15 +15,40 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
   List<Supplier> _suppliers = [];
   Supplier? _selectedSupplier;
 
+  
+  final Supplier _addSupplierOption = Supplier(
+    id: -1,
+    name: "➕ Add New Supplier",
+  );
+
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController _itemController = TextEditingController();
-  final TextEditingController _supplierController=TextEditingController();
+  /*final TextEditingController _supplierController=TextEditingController();*/
   final TextEditingController _quantityController=TextEditingController();
   final TextEditingController _unitPriceController = TextEditingController();
 
   double _totalPrice =0;
   
+  @override
+  void initState(){
+    super.initState();
+
+    _quantityController.addListener(_calculateTotal);
+    _unitPriceController.addListener(_calculateTotal);
+
+    _loadSuppliers();
+  }
+
+   Future<void> _loadSuppliers() async {
+    final suppliers = await DatabaseHelper.instance.getAllSuppliers();
+    if (mounted){
+      setState((){
+      _suppliers = suppliers;
+    });
+    }
+  }
+
   Future<void> _showAddSupplierDialog() async {
     final controller = TextEditingController();
 
@@ -47,26 +72,29 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
-                if (controller.text.trim().isEmpty) return;
+                final name= controller.text.trim();
+                if (name.isEmpty) return;
 
-                final supplier = Supplier(
-                  name: controller.text.trim(),
-                );
+                final supplier=Supplier(name: name);
 
                 await DatabaseHelper.instance.insertSupplier(supplier);
-                  Navigator.pop(context);
 
-                  await _loadSuppliers();
+                if (!mounted) return;
+                Navigator.pop(context);
+                
+                final updatedSuppliers = await DatabaseHelper.instance.getAllSuppliers();
 
-                  final suppliers = await DatabaseHelper.instance.getAllSuppliers();
+                final addedSupplier = updatedSuppliers.firstWhere(
+                  (s)=>s.name == name,
+                  orElse: () => updatedSuppliers.last,
+                );
 
-                  final addedSupplier = suppliers.firstWhere(
-                    (s)=>s.name==controller.text.trim(),
-                  );
-
-                  setState((){
+                if (mounted){
+                  setState(() {
+                    _suppliers = updatedSuppliers;
                     _selectedSupplier = addedSupplier;
                   });
+                }
               },
               child: const Text("Save"),
             ),
@@ -75,26 +103,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
       },
     );
   }
-
-
-  Future<void> _loadSuppliers() async {
-    final suppliers = 
-      await DatabaseHelper.instance.getAllSuppliers();
-
-    setState((){
-      _suppliers = suppliers;
-    });
-  }
-  @override
-  void initState(){
-    super.initState();
-
-    _quantityController.addListener(_calculateTotal);
-    _unitPriceController.addListener(_calculateTotal);
-
-    _loadSuppliers();
-  }
-
+  
   void _calculateTotal(){
     final quantity = int.tryParse(_quantityController.text) ?? 0;
     final unitPrice = double.tryParse(_unitPriceController.text) ?? 0;
@@ -107,7 +116,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
   @override
   void dispose(){
     _itemController.dispose();
-    _supplierController.dispose;
+    /*_supplierController.dispose;*/
     _quantityController.dispose;
     _unitPriceController.dispose;
     super.dispose();
@@ -115,6 +124,13 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
   void _savePurchase(){
     if(!_formKey.currentState!.validate()){
+      return;
+    }
+
+    if (_selectedSupplier==null){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please select a supplier")),
+      );
       return;
     }
 
@@ -173,20 +189,25 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
 
                   DropdownMenuItem<Supplier>(
                     value: _addSupplierOption,
-                    child: Text("➕ Add New Supplier"),
+                    child: Text(_addSupplierOption.name),
                   ),
                 ],
+                validator: (value){
+                  if (value == null || value.id == -1){
+                    return "Please select a valid supplier";
+                  }
+                  return null;
+                },
                 onChanged: (supplier) async {
                   if (supplier == null) return;
                                       
                   if (supplier.id==-1){
                     await _showAddSupplierDialog();
-                    return;
-                  }
+                  }else{
                     setState(() {
                       _selectedSupplier = supplier;
                     });
-                  
+                  }
                 },
               ),
               const SizedBox(height: 15),
@@ -203,7 +224,6 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                   if (int.tryParse(value)==null){
                     return "Quantity must be a whole number";
                   }
-
                   return null;
                 },
               ),
@@ -242,15 +262,12 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                 ),
                 child: Column(
                   children: [
-                    
                     const Icon(
                       Icons.calculate,
                       size: 40,
                       color: Colors.green,
                     ),
-
                     const SizedBox(height: 10),
-
                     const Text(
                       "Total Purchase Cost",
                       style: TextStyle(
@@ -258,9 +275,7 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     const SizedBox(height: 10),
-
                     Text(
                       "\$${_totalPrice.toStringAsFixed(2)}",
                       style: const TextStyle(
@@ -286,16 +301,10 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
                   ),
                 ),
               ),
-            ]
+            ],
           ),
         ),
       ),
     );
   }
-
-  final Supplier _addSupplierOption = Supplier(
-    id: -1,
-    name: "➕ Add New Supplier",
-  );
- 
 }

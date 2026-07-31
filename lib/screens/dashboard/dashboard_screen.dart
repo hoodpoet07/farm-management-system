@@ -17,8 +17,7 @@ class DashboardScreen extends StatefulWidget{
   const DashboardScreen({super.key});
   
   @override
-  State<DashboardScreen> createState()=>
-    _DashboardScreenState();
+  State<DashboardScreen> createState()=>_DashboardScreenState();
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
@@ -34,9 +33,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Future<void> _loadDashboard() async {
     summary= await DashboardService().getSummary();
-
-    setState((){});
+    if(mounted){
+      setState((){});
+    }
   }
+
   String _getGreeting(){
     final hour=DateTime.now().hour;
 
@@ -48,6 +49,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       return "Good Evening";
     }
   }
+
   @override
   Widget build(BuildContext context){
     return Scaffold(
@@ -67,10 +69,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
         
       ),
 
-            drawer: Drawer(
+      drawer: Drawer(
         child: Column(
           children: [
-            // Your top scrolling items stay inside Expanded to prevent pixel layout crashes
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
@@ -82,11 +83,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       child: Icon(
                         Icons.agriculture,
                         size: 40,
-                        color: Color.fromARGB(255, 3, 53, 5),
+                        color: Colors.green,
                       ),
                     ),
                     decoration: const BoxDecoration(
-                      color: Color.fromARGB(255, 3, 53, 5),
+                      color: Colors.green,
                     ),
                   ),
 
@@ -294,35 +295,35 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 15,
                 mainAxisSpacing: 15,
-                children: const [
+                children: [
 
                   DashboardCard(
                     icon: Icons.egg,
                     title: "Chickens",
-                    value: "0",
-                    color: Colors.orange,
+                    value: summary?.totalChickens.toString() ?? "0",
+                    color: Colors.green,
                     
                   ),
 
                   DashboardCard(
                     icon: Icons.shopping_cart,
                     title: "Purchases",
-                    value: "0",
-                    color: Colors.blue,
+                    value: "\$${summary?.totalExpenses != null ? summary!.totalExpenses.toStringAsFixed(2) : "0.00"}",
+                    color: Colors.green,
                   ),
 
                   DashboardCard(
                     icon: Icons.attach_money,
                     title: "Sales",
-                    value: "\$0.00",
+                    value: "\$${summary?.totalSales != null ? summary!.totalSales.toStringAsFixed(2) : "0.00"}",
                     color: Colors.green,
                   ),
 
                   DashboardCard(
                     icon: Icons.money_off,
                     title: "Expenses",
-                    value: "\$0.00",
-                    color: Colors.red,
+                    value: "\$${summary?.totalExpenses != null ? summary!.totalExpenses.toStringAsFixed(2) : "0.00"}",
+                    color: Colors.green,
                   ),
 
                 ],

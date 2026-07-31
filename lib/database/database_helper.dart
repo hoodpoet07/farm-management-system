@@ -95,31 +95,31 @@ class DatabaseHelper{
   Future<int> insertSale(Sale sale) async {
   final db = await database;
   return await db.insert('sales', sale.toMap());
-}
+ }
 
-Future<List<Sale>> getSalesByBatch(int batchId) async {
-  final db = await database;
-  final maps = await db.query(
-    'sales',
-    where: 'batchId = ?',
-    whereArgs: [batchId],
-    orderBy: 'id DESC',
-  );
-  return List.generate(maps.length, (i) => Sale.fromMap(maps[i]));
-}
-
-Future<int> getTotalSoldByBatch(int batchId) async {
-  final db = await database;
-  final result = await db.rawQuery(
-    'SELECT SUM(quantity) as total FROM sales WHERE batchId = ?',
-    [batchId],
-  );
-  
-  if (result.first['total'] != null) {
-    return result.first['total'] as int;
+  Future<List<Sale>> getSalesByBatch(int batchId) async {
+    final db = await database;
+    final maps = await db.query(
+      'sales',
+      where: 'batchId = ?',
+      whereArgs: [batchId],
+      orderBy: 'id DESC',
+    );
+    return List.generate(maps.length, (i) => Sale.fromMap(maps[i]));
   }
-  return 0;
-}
+
+  Future<int> getTotalSoldByBatch(int batchId) async {
+    final db = await database;
+    final result = await db.rawQuery(
+      'SELECT SUM(quantity) as total FROM sales WHERE batchId = ?',
+      [batchId],
+    );
+    
+    if (result.first['total'] != null) {
+      return result.first['total'] as int;
+    }
+    return 0;
+  }
   Future<int> insertChickenBatch(ChickenBatch batch) async {
     final db = await database;
     return await db.insert(
@@ -249,10 +249,8 @@ Future<int> getTotalSoldByBatch(int batchId) async {
     maps.length,
     (index) => Mortality.fromMap(maps[index]),
   );
-}
-}
-
-Future<void> _upgradeDatabase(
+ }
+ Future<void> _upgradeDatabase(
   Database db,
   int oldVersion,
   int newVersion,
@@ -287,7 +285,7 @@ Future<void> _upgradeDatabase(
           breed TEXT NOT NULL,
           quantity INTEGER NOT NULL,
           costPerBird REAL NOT NULL,
-          dateReceived TEXT NOT NULL
+          arrivalDate TEXT NOT NULL
         )
 ''');
     await db.execute('''
@@ -313,4 +311,5 @@ Future<void> _upgradeDatabase(
     )
   ''');
   }
+}
 }
