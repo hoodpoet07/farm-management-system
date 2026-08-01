@@ -24,7 +24,7 @@ class _ChatScreenState extends State<ChatScreen> {
   final _scrollController = ScrollController();
 
   _SetupState _setupState = _SetupState.checking;
-  double _downloadProgress = 0;
+  final double _downloadProgress = 0;
   String _errorMessage = '';
   bool _isGenerating = false;
   StreamSubscription<String>? _streamSub;
@@ -36,47 +36,63 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Future<void> _setup() async {
-    try {
-      final exists = await ModelManager.isModelDownloaded();
-      if (!exists) {
-        setState(() => _setupState = _SetupState.downloading);
-        await ModelManager.downloadModel(
-          onProgress: (p) => setState(() => _downloadProgress = p),
-        );
+  try {
+    setState(() {
+      _setupState = _SetupState.loading;
+    });
+
+    await ModelManager.copyModelFromAssets();
+
+    if (!mounted) return;
+
+    final modelPath = await ModelManager.getModelPath();
+
+    print("Model path: $modelPath");
+
+    await _service.init(modelPath);
+
+    if (!mounted) {
+      // If the widget was disposed while initializing, clean up service and exit.
+      try {
+        await _service.dispose();
+      } catch (_) {}
+      return;
+    }
+
+    _streamSub = _service.responseStream.listen((token) {
+      _appendToLastAiMessage(token);
+      _scrollToBottom();
+    }, onError: (e, st) {
+      // Log stream errors and show an error state if still mounted.
+      print('Llama stream error: $e');
+      print(st);
+      if (mounted) {
+        setState(() {
+          _setupState = _SetupState.error;
+          _errorMessage = e.toString();
+        });
       }
+    });
 
-      setState(() => _setupState = _SetupState.loading);
+    if (!mounted) return;
 
-      /**gswsgwgu */
-      final path = await ModelManager.getModelPath();
+    setState(() {
+      _setupState = _SetupState.ready;
+    });
 
-      print("========================================");
-      print("Model path: $path");
-      print("Exists: ${await File(path).length()} bytes");
+  } catch (e, st) {
+    print(e);
+    print(st);
 
-      if (File(path).existsSync()){
-        print("FIle size: ${await File(path).length()} bytes");
-      }
-
-      print("========================================");
-
-      await _service.init(path);
-
-      /** hshhdhhdhdhdd */
-      _streamSub = _service.responseStream.listen((token) {
-        _appendToLastAiMessage(token);
-        _scrollToBottom();
-      });
-
-      setState(() => _setupState = _SetupState.ready);
-    } catch (e) {
+    if (mounted) {
       setState(() {
         _setupState = _SetupState.error;
         _errorMessage = e.toString();
       });
     }
   }
-
+ }
+ 
   void _appendToLastAiMessage(String token) {
     if (_messages.isEmpty || _messages.last.isUser) return;
     setState(() {
