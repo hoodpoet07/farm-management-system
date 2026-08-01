@@ -184,7 +184,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const VirtualScreen(),
+                          builder: (context) => const ChatScreen(),
                         ),
                       ).then((_) => _loadDashboard());
                     },

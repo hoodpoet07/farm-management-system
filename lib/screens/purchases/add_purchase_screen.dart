@@ -116,7 +116,6 @@ class _AddPurchaseScreenState extends State<AddPurchaseScreen> {
   @override
   void dispose(){
     _itemController.dispose();
-    /*_supplierController.dispose;*/
     _quantityController.dispose;
     _unitPriceController.dispose;
     super.dispose();
