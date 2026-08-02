@@ -1,5 +1,5 @@
 class ChatMessage {
-  String text;
+  final String text;
   final bool isUser;
   final DateTime timestamp;
 

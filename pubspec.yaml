@@ -48,7 +48,9 @@ dependencies:
   llama_cpp_dart: ^0.2.2
   http: ^1.2.0
   path_provider: ^2.1.0
-
+  flutter_markdown: ^0.7.3
+  markdown: ^7.2.2
+  
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
