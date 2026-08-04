@@ -21,6 +21,15 @@ class ChatHistoryService{
     return await _db.getChatMessages(sessionId);
   }
 
+  Future<List<ChatSession>> getAllSessions() async {
+    final db = await DatabaseHelper.instance.database;
+
+    final result = await db.query(
+      'chat_sessions',
+      orderBy: 'updated_at DESC',
+    );
+    return result.map((e)=> ChatSession.fromMap(e)).toList();
+  }
   Future<void> saveMessage({
     required int sessionId,
     required String message,

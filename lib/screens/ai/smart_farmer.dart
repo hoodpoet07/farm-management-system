@@ -38,6 +38,44 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
+  Future<void> _createNewChat() async {
+    _currentSessionId = await _historyService.createNewChat();
+    setState((){
+      _messages.clear();
+      _messages.add(
+        ChatMessage(
+          text:
+              "👋 Hello! I'm RIMAI.\n\nHow can I help you today?",
+          isUser: false,
+        ),
+      );
+    });
+    await _loadSessions();
+  }
+
+  Future<void> _loadSessions() async{
+    setState((){
+      _loadingChats = true;
+    });
+    _sessions = await _historyService.getAllSessions();
+
+    if (mounted){
+      setState((){
+        _loadingChats = false;
+      });
+    }
+  }
+  Future<void> _openSession(int id) async {
+    _currentSessionId = id;
+    final history = await _historyService.getMessages(id);
+    setState(() {
+      _messages.clear();
+      _messages.addAll(history.map((item)=> ChatMessage(
+        text: item.message,
+        isUser: item.isUser,
+      )));
+    });
+  }
   Future<void> _loadChatSessions() async {
     setState(() {
       _loadingChats = true;
@@ -94,21 +132,25 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
   Future<void> _sendMessage() async {
-
     final text = _controller.text.trim();
-
     if (text.isEmpty) return;
-
     setState(() {
-
       _messages.add(
         ChatMessage(
           text: text,
           isUser: true,
-        ),
-      );
-      _isTyping = true;
+        ),);
+        _isTyping=true;
     });
+      
+      await _historyService.saveMessage(
+        sessionId: _currentSessionId!,
+        message: text,
+        isUser: true,
+      );
+
+      
+    
 
     await _historyService.saveMessage(
       sessionId: _currentSessionId!,
@@ -232,7 +274,33 @@ class _ChatScreenState extends State<ChatScreen> {
         child: SafeArea(
           child: Column(
             children: [
-              
+              ListTile(
+                leading: const Icon(Icons.add),
+                title: const Text("New Chat"),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await _createNewChat();
+                },
+              ),
+              const Divider(),
+              Expanded(
+                child: _loadingChats ? const Center(child: CircularProgressIndicator(),)
+                  :ListView.builder(
+                    itemCount: _sessions.length,
+                    itemBuilder: (context, index){
+                      final session = _sessions[index];
+                      return ListTile(
+                        leading: const Icon(Icons.chat),
+                        title: Text(session.title),
+                        subtitle: Text(session.createdAt),
+                        onTap: () async {
+                          Navigator.pop(context);
+                          await _openSession(session.id!);
+                        },
+                      );
+                    },
+                  ),
+              ),
             ]
           ),
         ),
