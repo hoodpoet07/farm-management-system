@@ -6,6 +6,8 @@ import '../models/supplier.dart';
 import '../models/chicken_batch.dart';
 import '../models/mortality.dart';
 import '../models/sales.dart';
+import '../models/chat_history.dart';
+import '../models/chat_session.dart';
 
 class DatabaseHelper{
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -23,7 +25,7 @@ class DatabaseHelper{
 
     return await openDatabase(
         path,
-        version: 5,
+        version: 6,
         onCreate: _createDatabase,
         onUpgrade: _upgradeDatabase,
     );
@@ -90,6 +92,24 @@ class DatabaseHelper{
       date TEXT NOT NULL
       )
   ''');
+
+  await db.execute('''
+    CREATE TABLE chat_sessions(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      createdAt TEXT NOT NULL)'''
+);
+
+  await db.execute('''
+    CREATE TABLE chat_messages(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sessionId INTEGER NOT NULL,
+      message TEXT NOT NULL,
+      isUser INTEGER NOT NULL,
+      timestamp TEXT NOT NULL,
+      FOREIGN KEY(sessionId) REFERENCES chat_sessions(id) 
+    )
+''');
   }
   
   Future<int> insertSale(Sale sale) async {
@@ -278,6 +298,73 @@ class DatabaseHelper{
     (index) => Mortality.fromMap(maps[index]),
   );
  }
+
+ Future<int> createChatSession(ChatSession session) async {
+  final db= await database;
+  return await db.insert(
+    'chat_sessions',
+    session.toMap(),
+  );
+ }
+
+ Future<List<ChatSession>> getChatSessions() async {
+  final db = await database;
+
+  final maps = await db.query(
+    'chat_sessions',
+    orderBy: 'id DESC',
+  );
+
+  return maps
+      .map((e) => ChatSession.fromMap(e))
+      .toList();
+}
+  Future<int> insertChatMessage(
+    ChatHistory message) async {
+
+  final db = await database;
+
+  return await db.insert(
+    'chat_messages',
+    message.toMap(),
+  );
+}
+
+  Future<List<ChatHistory>> getChatMessages(
+    int sessionId) async {
+
+  final db = await database;
+
+  final maps = await db.query(
+    'chat_messages',
+    where: 'sessionId=?',
+    whereArgs: [sessionId],
+    orderBy: 'id ASC',
+  );
+
+  return maps
+      .map((e) => ChatHistory.fromMap(e))
+      .toList();
+}
+
+  Future<void> deleteChatSession(
+    int sessionId) async {
+
+  final db = await database;
+
+  await db.delete(
+    'chat_messages',
+    where: 'sessionId=?',
+    whereArgs: [sessionId],
+  );
+
+  await db.delete(
+    'chat_sessions',
+    where: 'id=?',
+    whereArgs: [sessionId],
+  );
+ }
+
  Future<void> _upgradeDatabase(
   Database db,
   int oldVersion,
@@ -337,6 +424,27 @@ class DatabaseHelper{
       customerName TEXT,
       date TEXT NOT NULL
     )
+  ''');
+  }
+  if (oldVersion < 6) {
+
+  await db.execute('''
+  CREATE TABLE IF NOT EXISTS chat_sessions(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    createdAt TEXT NOT NULL
+  )
+  ''');
+
+  await db.execute('''
+  CREATE TABLE IF NOT EXISTS chat_messages(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    sessionId INTEGER NOT NULL,
+    message TEXT NOT NULL,
+    isUser INTEGER NOT NULL,
+    timestamp TEXT NOT NULL,
+    FOREIGN KEY(sessionId) REFERENCES chat_sessions(id)
+  )
   ''');
   }
 }
