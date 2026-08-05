@@ -40,25 +40,51 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> _createNewChat() async {
     _currentSessionId = await _historyService.createNewChat();
+    await _loadSessions();
     setState((){
       _messages.clear();
       _messages.add(
         ChatMessage(
-          text:
-              "👋 Hello! I'm RIMAI.\n\nHow can I help you today?",
+          text: "👋 Hello! I'm RIMAI.\n\nHow can I help you today?",
           isUser: false,
         ),
       );
     });
-    await _loadSessions();
+    await _loadChatSessions();
+  }
+
+  Future<bool> _showDeleteConfirmationDialog(BuildContext context) async {
+    return await showDialog<bool>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text("Delete Chat Session"),
+            content: const Text(
+              "Are you sure you want to delete this chat session? This action cannot be undone.",
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text("Cancel"),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.red,
+                ),
+                child: const Text("Delete"),
+              ),
+            ],
+          );
+        },
+      ) ??
+      false;
   }
 
   Future<void> _loadSessions() async{
     setState((){
       _loadingChats = true;
     });
-    _sessions = await _historyService.getAllSessions();
-
     if (mounted){
       setState((){
         _loadingChats = false;
@@ -67,6 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
   Future<void> _openSession(int id) async {
     _currentSessionId = id;
+    _chatService.clearConversation();
     final history = await _historyService.getMessages(id);
     setState(() {
       _messages.clear();
@@ -90,32 +117,19 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
   Future<void> _initializeChat() async {
-      final chats = await _historyService.getChats();
-      if(chats.isEmpty){
-        _currentSessionId = await _historyService.createNewChat();
-
-        setState((){
-          _messages.add(
-            ChatMessage(
-              text:
-                  "👋 Hello! I'm RIMAI.\n\nHow can I help you today?",
-              isUser: false,
-            ),
-          );
-        });
-
+      await _loadChatSessions();
+      //final chats = await _historyService.getChats();
+      if(_sessions.isEmpty){
+         _currentSessionId = await _historyService.createNewChat();
         await _historyService.saveMessage(
           sessionId: _currentSessionId!,
-          message:
-              "👋 Hello! I'm RIMAI.\n\nHow can I help you today?",
+          message: "👋 Hello! I'm RIMAI.\n\nHow can I help you today?",
           isUser: false,
         );
+        await _loadChatSessions();
       }else{
-
-        _currentSessionId = chats.first.id;
-        final history = await _historyService.getMessages(
-          _currentSessionId!,
-        );
+        _currentSessionId = _sessions.first.id;
+        final history = await _historyService.getMessages(_currentSessionId!,        );
 
         setState((){
           _messages.clear();
@@ -142,42 +156,35 @@ class _ChatScreenState extends State<ChatScreen> {
         ),);
         _isTyping=true;
     });
-      
-      await _historyService.saveMessage(
-        sessionId: _currentSessionId!,
-        message: text,
-        isUser: true,
-      );
-
-      
-    
-
     await _historyService.saveMessage(
       sessionId: _currentSessionId!,
       message: text,
       isUser: true,
     );
 
-    _controller.clear();
+    final currentMessages = await _historyService.getMessages(_currentSessionId!);
+    final userMessages = currentMessages.where((m)=> m.isUser).toList();
 
+    if (userMessages.length==1){
+      final dynamicTitle = text.length>30?'${text.substring(0, 30)}...':text;
+      await _historyService.updateSessionTitle(_currentSessionId!, dynamicTitle);
+      await _loadChatSessions();
+    }
+    _controller.clear();
     _scrollToBottom();
 
     try {
-
-      final reply =
-          await _chatService.sendMessage(text);
+      final reply = await _chatService.sendMessage(text);
 
       setState(() {
-
         _messages.add(
           ChatMessage(
             text: reply,
             isUser: false,
           ),
         );
-
         _isTyping = false;
-  });
+      });
 
       await _historyService.saveMessage(
         sessionId: _currentSessionId!,
@@ -185,23 +192,18 @@ class _ChatScreenState extends State<ChatScreen> {
         isUser: false,
       );
       _scrollToBottom();
-
     } catch (e) {
 
       setState(() {
 
         _messages.add(
           ChatMessage(
-            text:
-                "Error connecting to RIMAI AI. Try again later.",
+            text: "Error \n\n${e.toString()}",
             isUser: false,
           ),
         );
-
         _isTyping = false;
-
       });
-
       _scrollToBottom();
 
     }
@@ -289,10 +291,32 @@ class _ChatScreenState extends State<ChatScreen> {
                     itemCount: _sessions.length,
                     itemBuilder: (context, index){
                       final session = _sessions[index];
+                      final formattedDate = session.createdAt.length>=10
+                      ? session.createdAt.substring(0, 10)
+                      : session.createdAt;
+
                       return ListTile(
                         leading: const Icon(Icons.chat),
-                        title: Text(session.title),
-                        subtitle: Text(session.createdAt),
+                        title: Text(
+                          session.title,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          ),
+                        subtitle: Text(formattedDate),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                          onPressed: () async {
+                            final confirm = await _showDeleteConfirmationDialog(context);
+
+                            if (confirm){
+                              await _historyService.deleteChat(session.id!);
+                              await _loadChatSessions();
+                              if(_currentSessionId == session.id){
+                                await _createNewChat();
+                              }
+                            }
+                          },
+                        ),
                         onTap: () async {
                           Navigator.pop(context);
                           await _openSession(session.id!);
@@ -317,35 +341,6 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
         backgroundColor: Color.fromRGBO(16, 6, 51, 1),
         centerTitle: true,
-        
-        actions: [
-
-          IconButton(
-            icon: const Icon(Icons.add_comment),
-            onPressed: () async {
-              final id = await _historyService.createNewChat();
-
-              setState(() {
-                _currentSessionId = id;
-                _messages.clear();
-                _messages.add(
-                  ChatMessage(
-                    text:
-                        "👋 Hello! I'm FarmMate AI.",
-                    isUser: false,
-                  ),
-                );
-              });
-
-              await _historyService.saveMessage(
-                sessionId: id,
-                message:
-                    "👋 Hello! I'm FarmMate AI.",
-                isUser: false,
-              );
-            },
-          ),
-        ]
 
       ),
 

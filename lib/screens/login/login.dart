@@ -7,6 +7,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context){
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 5, 2, 59),
       body: SafeArea(
         child: Center(
           child: Column(
@@ -17,6 +18,7 @@ class LoginScreen extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 24,
+                  color: Colors.white,
                 )
               ),
               SizedBox(height: 10),
@@ -24,6 +26,7 @@ class LoginScreen extends StatelessWidget {
                 'Welcome Back Farmer',
                 style: TextStyle(
                   fontSize: 20,
+                  color: Colors.white,
                 )
               ),
               SizedBox(height: 20),
@@ -32,7 +35,7 @@ class LoginScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 172, 194, 173),
+                    color: const Color.fromARGB(255, 5, 2, 59),
                     border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -54,7 +57,7 @@ class LoginScreen extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 25.0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 172, 194, 173),
+                    color: const Color.fromARGB(255, 5, 2, 59),
                     border: Border.all(color: Colors.white),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -70,21 +73,21 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 10),
+              SizedBox(height: 30),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal:25.0),
                 child: Container(
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 172, 194, 173),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Center(
                     child: Text(
                       'Sign In',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: Color.fromARGB(255, 5, 2, 59),
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
                         ),
