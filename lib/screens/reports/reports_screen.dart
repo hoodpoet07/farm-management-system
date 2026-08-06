@@ -106,7 +106,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                   ListTile(
                     leading: const CircleAvatar(
                       backgroundColor: Colors.blueAccent,
-                      child: Icon(Icons.pets, color: Colors.white),
+                      child: Icon(Icons.egg, color: Colors.white),
                     ),
                     title: const Text('Active Birds On Farm'),
                     trailing: Text(
