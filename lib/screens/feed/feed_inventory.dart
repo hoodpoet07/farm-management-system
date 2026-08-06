@@ -47,7 +47,7 @@ class _FeedInventoryScreenState extends State<FeedInventoryScreen> {
                 decoration: const InputDecoration(labelText: 'Feed Name/Brand'),
               ),
               DropdownButtonFormField<String>(
-                value: category,
+                initialValue: category,
                 items: ['Starter Mash', 'Grower Mash', 'Finisher Pellets', 'Layer Feed']
                     .map((c) => DropdownMenuItem(value: c, child: Text(c)))
                     .toList(),
@@ -76,7 +76,9 @@ class _FeedInventoryScreenState extends State<FeedInventoryScreen> {
             onPressed: () async {
               if (nameController.text.isEmpty ||
                   qtyController.text.isEmpty ||
-                  costController.text.isEmpty) return;
+                  costController.text.isEmpty) {
+                return;
+              }
 
               await DatabaseHelper.instance.insertFeed(
                 Feed(
