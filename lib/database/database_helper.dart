@@ -8,6 +8,9 @@ import '../models/mortality.dart';
 import '../models/sales.dart';
 import '../models/chat_history.dart';
 import '../models/chat_session.dart';
+import '../models/user.dart';
+import '../models/feed.dart';
+import 'package:flutter/foundation.dart';
 
 class DatabaseHelper{
   static final DatabaseHelper instance = DatabaseHelper._init();
@@ -25,10 +28,26 @@ class DatabaseHelper{
 
     return await openDatabase(
         path,
-        version: 6,
+        version: 7,
         onCreate: _createDatabase,
         onUpgrade: _upgradeDatabase,
     );
+  }
+
+  Future<Map<String, dynamic>> getSystemSummaryContext() async {
+    final activeBirds = await getTotalChickensCount();
+    final sales = await getTotalSalesAmount();
+    final expenses = await getTotalFeedCost();
+    final feedCost = await getTotalFeedCost();
+    final mortality = await getTotalMortalityCount();
+
+    return{
+      "activeBirds": activeBirds,
+      "totalSales": sales,
+      "totalExpenses": expenses,
+      "totalFeedCost": feedCost,
+      "totalMortality": mortality,
+    };
   }
   Future _createDatabase(Database db,int version) async {
     await db.execute('''
@@ -110,6 +129,34 @@ class DatabaseHelper{
       FOREIGN KEY(sessionId) REFERENCES chat_sessions(id) 
     )
 ''');
+
+  await db.execute('''
+    CREATE TABLE users(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      role TEXT NOT NULL
+      )
+    ''');
+
+  await db.insert('users',{
+    'username': 'admin',
+    'password': 'admin123',
+    'role': 'admin',
+  });
+
+    await db.execute('''
+      CREATE TABLE feed_inventory(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        feedName TEXT NOT NULL,
+        category TEXT NOT NULL,
+        quantityKg REAL NOT NULL,
+        costPerKg REAL NOT NULL,
+        dateAdded TEXT NOT NULL
+      )
+''');
+
+
   }
   
   Future<int> insertSale(Sale sale) async {
@@ -365,6 +412,69 @@ class DatabaseHelper{
   );
  }
 
+  Future<User?> loginUser(String username, String password) async{
+    final db = await database;
+    final res = await db.query(
+      'users',
+      where: 'username = ? AND password = ?',
+      whereArgs: [username, password],
+    );
+    if(res.isNotEmpty){
+      return User.fromMap(res.first);
+    }
+    return null;
+  }
+
+  Future<int> insertUser(User user) async {
+    final db = await database;
+    return await db.insert('users',user.toMap());
+  }
+
+  Future<List<User>> getAllUSers() async {
+    final db = await database;
+    final maps = await db.query('users', orderBy: 'id ASC');
+    return maps.map((e)=> User.fromMap(e)).toList();
+  }
+
+  Future<int> deleteUser(int id) async{
+    final db = await database;
+    return await db.delete('users',where: 'id=?',whereArgs: [id]);
+  }
+
+  Future<int> insertFeed(Feed feed) async {
+  final db = await database;
+  return await db.insert('feed_inventory', feed.toMap());
+}
+
+  Future<List<Feed>> getAllFeeds() async {
+    final db = await database;
+    final maps = await db.query('feed_inventory', orderBy: 'id DESC');
+    return maps.map((e) => Feed.fromMap(e)).toList();
+  }
+
+  Future<int> deleteFeed(int id) async {
+    final db = await database;
+    return await db.delete('feed_inventory', where: 'id = ?', whereArgs: [id]);
+  }
+
+  Future<double> getTotalFeedCost() async {
+    final db = await database;
+    try{
+      final result = await db.rawQuery('SELECT SUM(quantityKg * costPerKg) as total FROM feed_inventory',);
+      if(result.isNotEmpty && result.first['total'] != null){
+        return (result.first['total'] as num).toDouble();
+      }
+    }catch(e){
+      debugPrint("Error fetching feed cost summary: $e");
+    }
+    return 0.0;
+  }
+
+  Future<int> getTotalMortalityCount() async {
+    final db = await database;
+    final result = await db.rawQuery('SELECT SUM(quantity) as total FROM mortality');
+    return (result.first['total'] as num?)?.toInt() ?? 0;
+  }
  Future<void> _upgradeDatabase(
   Database db,
   int oldVersion,
@@ -446,6 +556,32 @@ class DatabaseHelper{
     FOREIGN KEY(sessionId) REFERENCES chat_sessions(id)
   )
   ''');
+
+  await db.execute('''
+    CREATE TABLE IF NOT EXISTS users(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      role TEXT NOT NULL
+    )
+  ''');
+
+  await db.rawInsert('''
+    INSERT OR IGNORE INTO users (username, password, role) 
+    VALUES ('admin', 'admin123', 'admin')
+  ''');
   }
+  if (oldVersion < 8) {
+  await db.execute('''
+    CREATE TABLE IF NOT EXISTS feed_inventory(
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      feedName TEXT NOT NULL,
+      category TEXT NOT NULL,
+      quantityKg REAL NOT NULL,
+      costPerKg REAL NOT NULL,
+      dateAdded TEXT NOT NULL
+    )
+  ''');
+}
 }
 }

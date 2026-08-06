@@ -1,3 +1,5 @@
+import 'dart:convert';
+import '../../database/database_helper.dart';
 import 'package:flutter/material.dart';
 import '../../models/chat_message.dart';
 import 'package:farm_management_system/services/groq_chat_service.dart';
@@ -5,6 +7,8 @@ import '../../widgets/chat_bubble.dart';
 import '../../widgets/typing_indicator.dart';
 import '../../services/chat_history_service.dart';
 import '../../models/chat_session.dart';
+import '../../models/expense.dart';
+import '../../models/chicken_batch.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -15,7 +19,7 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
 
-  final GroqChatService _chatService = GroqChatService();
+  final _chatService = ChatService();
   final TextEditingController _controller = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final ChatHistoryService _historyService = ChatHistoryService();
@@ -93,7 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
   Future<void> _openSession(int id) async {
     _currentSessionId = id;
-    _chatService.clearConversation();
+    //_chatService.clearConversation();
     final history = await _historyService.getMessages(id);
     setState(() {
       _messages.clear();
@@ -129,7 +133,7 @@ class _ChatScreenState extends State<ChatScreen> {
         await _loadChatSessions();
       }else{
         _currentSessionId = _sessions.first.id;
-        final history = await _historyService.getMessages(_currentSessionId!,        );
+        final history = await _historyService.getMessages(_currentSessionId!);
 
         setState((){
           _messages.clear();
@@ -149,12 +153,7 @@ class _ChatScreenState extends State<ChatScreen> {
     final text = _controller.text.trim();
     if (text.isEmpty) return;
     setState(() {
-      _messages.add(
-        ChatMessage(
-          text: text,
-          isUser: true,
-        ),);
-        _isTyping=true;
+      _messages.add(ChatMessage(text: text,isUser: true));
     });
     await _historyService.saveMessage(
       sessionId: _currentSessionId!,
@@ -162,17 +161,44 @@ class _ChatScreenState extends State<ChatScreen> {
       isUser: true,
     );
 
-    final currentMessages = await _historyService.getMessages(_currentSessionId!);
-    final userMessages = currentMessages.where((m)=> m.isUser).toList();
+    final rawAiReply = await _chatService.sendMessage(text);
+    String displayReply=rawAiReply;
 
-    if (userMessages.length==1){
-      final dynamicTitle = text.length>30?'${text.substring(0, 30)}...':text;
-      await _historyService.updateSessionTitle(_currentSessionId!, dynamicTitle);
-      await _loadChatSessions();
+    try{
+      if (rawAiReply.trim().startsWith('{') && rawAiReply.trim().endsWith('}')){
+        final actionData = jsonDecode(rawAiReply);
+        if(actionData['action']=='ADD_EXPENSE'){
+          await DatabaseHelper.instance.insertExpense(
+            Expense(
+              title: actionData['title'],
+              category: actionData['category'] ?? 'General',
+              amount: (actionData['amount'] as num).toDouble(),
+              description: 'Added via RIMAI Assistant',
+              date: DateTime.now().toIso8601String().substring(0, 10),
+            )
+          );
+          displayReply="Successfully added expense: **${actionData['title']}** for \$${actionData['amount']}.";
+      }else if(actionData['action']=='ADD_BATCH'){
+        await DatabaseHelper.instance.insertChickenBatch(
+          ChickenBatch(
+            batchName: actionData['batchName'],
+            breed: actionData['breed'],
+            quantity: actionData['quantity'],
+            costPerBird: (actionData['costPerBird'] as num).toDouble(),
+            arrivalDate: DateTime.now().toIso8601String(),
+          ),
+        );
+        displayReply="Successfully registered new batch: **${actionData['batchName']}** (${actionData['quantity']} ${actionData['breed']} birds).";
+      }
     }
-    _controller.clear();
-    _scrollToBottom();
+    }catch (e){
+      displayReply=rawAiReply;
+    }
 
+    setState(() {
+      _messages.add(ChatMessage(text: displayReply, isUser: false));
+    });
+  
     try {
       final reply = await _chatService.sendMessage(text);
 
@@ -188,7 +214,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
       await _historyService.saveMessage(
         sessionId: _currentSessionId!,
-        message: reply,
+        message: displayReply,
         isUser: false,
       );
       _scrollToBottom();
@@ -211,61 +237,27 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _scrollToBottom() {
-
     Future.delayed(
-      const Duration(milliseconds: 150),
-      () {
+      const Duration(milliseconds: 150),() {
 
         if (_scrollController.hasClients) {
 
           _scrollController.animateTo(
-
             _scrollController.position.maxScrollExtent,
-
-            duration:
-                const Duration(milliseconds: 300),
-
+            duration: const Duration(milliseconds: 300),
             curve: Curves.easeOut,
-
           );
-
         }
-
       },
     );
 
   }
 
-  void _clearChat() {
-
-    setState(() {
-
-      _messages.clear();
-
-      _messages.add(
-        ChatMessage(
-          text:
-              "👋 Hello! I'm RIMAI.\n\nHow can I help you today?",
-          isUser: false,
-          timestamp: DateTime.now(),
-        ),
-      );
-
-    });
-
-    _chatService.clearConversation();
-
-  }
-
   @override
   void dispose() {
-
     _controller.dispose();
-
     _scrollController.dispose();
-
     super.dispose();
-
   }
 
   @override
@@ -431,4 +423,3 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 }
-
