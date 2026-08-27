@@ -54,12 +54,12 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 16, 6, 51),
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.green),
           onPressed: () {
             Navigator.pushReplacement(
               context,
@@ -78,7 +78,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 const Icon(
                   Icons.admin_panel_settings,
                   size: 80,
-                  color: Colors.white,
+                  color: Colors.green,
                 ),
                 const SizedBox(height: 20),
                 const Text(
@@ -86,7 +86,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 26,
-                    color: Colors.white,
+                    color: Colors.green,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -99,19 +99,19 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 // Username Field
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white10,
-                    border: Border.all(color: Colors.white30),
+                    color: Color.fromARGB(255,165, 214, 167),
+                    border: Border.all(color: Color.fromARGB(255,165, 214, 167)),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: TextField(
                       controller: _usernameController,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.black),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Admin Username',
-                        hintStyle: TextStyle(color: Colors.white54),
+                        hintStyle: TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
@@ -122,8 +122,8 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                 // Password Field
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white10,
-                    border: Border.all(color: Colors.white30),
+                    color: Color.fromARGB(255,165, 214, 167),
+                    border: Border.all(color: Color.fromARGB(255,165, 214, 167)),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
@@ -131,11 +131,11 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                     child: TextField(
                       controller: _passwordController,
                       obscureText: true,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.black),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Admin Password',
-                        hintStyle: TextStyle(color: Colors.white54),
+                        hintStyle: TextStyle(color: Colors.black),
                       ),
                     ),
                   ),
@@ -149,7 +149,7 @@ class _AdminLoginScreenState extends State<AdminLoginScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: Colors.deepPurpleAccent,
+                      color: Colors.greenAccent,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(

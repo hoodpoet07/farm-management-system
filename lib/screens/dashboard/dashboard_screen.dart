@@ -75,13 +75,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
           child: Column(
             children: [
               UserAccountsDrawerHeader(
-                      accountName: const Text("Farm Manager"), 
-                      accountEmail: const Text("Welcome Back"),
+                      accountName: const Text("Farm Manager",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      ), 
+                      accountEmail: const Text("Welcome Back",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      ),
                       currentAccountPicture: const CircleAvatar(
                         child: Icon(
                           Icons.agriculture,
                           size: 40,
-                          color: Color.fromARGB(255, 22, 141, 26),
+                          color: Colors.green,
                         ),
                       ),
                       decoration: const BoxDecoration(

@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 16, 6, 51),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -73,7 +73,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const Icon(
                   Icons.agriculture,
                   size: 80,
-                  color: Colors.white,
+                  color: Colors.green,
                 ),
                 const SizedBox(height: 20),
 
@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 26,
-                    color: Colors.white,
+                    color: Colors.green,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -91,27 +91,27 @@ class _LoginScreenState extends State<LoginScreen> {
                   'Welcome Back Farmer',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Colors.white70,
+                    color: Colors.green,
                   ),
                 ),
                 const SizedBox(height: 40),
 
-                // Username Field (Identical styling to Admin screen)
+               
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white10,
-                    border: Border.all(color: Colors.white30),
+                    color: Colors.green.shade50,
+                    border: Border.all(color: Colors.green.shade200),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: TextField(
                       controller: _usernameController,
-                      style: const TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.green),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Username',
-                        hintStyle: TextStyle(color: Colors.white54),
+                        hintStyle: TextStyle(color: Colors.green),
                       ),
                     ),
                   ),
@@ -122,8 +122,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Password Field (Identical styling to Admin screen)
                 Container(
                   decoration: BoxDecoration(
-                    color: Colors.white10,
-                    border: Border.all(color: Colors.white30),
+                    color: Colors.green.shade50,
+                    border: Border.all(color: Colors.green.shade200),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Padding(
@@ -135,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: 'Password',
-                        hintStyle: TextStyle(color: Colors.white54),
+                        hintStyle: TextStyle(color: Colors.green),
                       ),
                     ),
                   ),
@@ -149,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.green.shade200,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
@@ -184,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: const Text(
                     'Admin Portal Login',
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: Colors.green,
                       decoration: TextDecoration.underline,
                     ),
                   ),
