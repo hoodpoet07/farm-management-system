@@ -38,13 +38,16 @@ Current Live Farm Data:
 - Feed Inventory Cost: \$${summary['totalFeedCost']}
 - Total Mortality Recorded: ${summary['totalMortality']}
 
+if the user asks to add an action item output JSON:
+{"action":"ADD_NOTE","title":"...","category":"Action Item", "content": "..."}
+
 If the user asks to add an expense or chicken batch, respond ONLY with a JSON payload in this format:
 {"action": "ADD_EXPENSE", "title": "...", "amount": 0.0, "category": "..."}
 {"action": "ADD_BATCH", "batchName": "...", "breed": "...", "quantity": 0, "costPerBird": 0.0}
 
 Otherwise, answer their query standardly using the live farm data above.If the question is unrelated to farming, tell them what you are for.
 ''';
-
+    final targetModel = (AppConstants.model.isNotEmpty && !AppConstants.model.contains('3.1-8b-instant')) ? AppConstants.model: 'llama-3.3-70b-versatile';
     // 3. Make HTTP call to AI Model Endpoint (Groq / OpenAI compatible format)
     final response = await http.post(
       Uri.parse('https://api.groq.com/openai/v1/chat/completions'),
@@ -53,7 +56,7 @@ Otherwise, answer their query standardly using the live farm data above.If the q
         'Authorization': 'Bearer $_apiKey',
       },
       body: jsonEncode({
-        "model": AppConstants.model,
+        "model": targetModel,
         "messages": [
           {"role": "system", "content": systemPrompt},
           {"role": "user", "content": userMessage}

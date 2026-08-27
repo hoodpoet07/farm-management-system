@@ -1,29 +1,27 @@
 import 'package:flutter/material.dart';
 import '../../database/database_helper.dart';
-import 'admin_login_screen.dart';
-import '../dashboard/dashboard_screen.dart';
+import '../login/login.dart';
+import 'admin_user_management_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class AdminLoginScreen extends StatefulWidget {
+  const AdminLoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<AdminLoginScreen> createState() => _AdminLoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _AdminLoginScreenState extends State<AdminLoginScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleAdminLogin() async {
     final username = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
     if (username.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter both username and password'),
-        ),
+        const SnackBar(content: Text('Please enter both username and password')),
       );
       return;
     }
@@ -36,21 +34,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
     if (!mounted) return;
 
-    if (user != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Welcome back, ${user.username}!')),
-      );
-
+    if (user != null && user.role == 'admin') {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (context) => const DashboardScreen(),
+          builder: (context) => const AdminUserManagementScreen(),
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Invalid username or password'),
+          content: Text('Access Denied: Invalid admin credentials'),
           backgroundColor: Colors.red,
         ),
       );
@@ -61,25 +55,34 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 16, 6, 51),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginScreen()),
+            );
+          },
+        ),
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 25.0),
             child: Column(
               children: [
-                const SizedBox(height: 50),
-
-                // Matching Icon Style
+                const SizedBox(height: 30),
                 const Icon(
-                  Icons.agriculture,
+                  Icons.admin_panel_settings,
                   size: 80,
                   color: Colors.white,
                 ),
                 const SizedBox(height: 20),
-
-                // Header Titles
                 const Text(
-                  'Farmer Portal',
+                  'Admin Portal',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 26,
@@ -88,15 +91,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Welcome Back Farmer',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
+                  'Restricted Access System',
+                  style: TextStyle(fontSize: 14, color: Colors.white70),
                 ),
                 const SizedBox(height: 40),
 
-                // Username Field (Identical styling to Admin screen)
+                // Username Field
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white10,
@@ -110,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'Username',
+                        hintText: 'Admin Username',
                         hintStyle: TextStyle(color: Colors.white54),
                       ),
                     ),
@@ -119,7 +119,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 20),
 
-                // Password Field (Identical styling to Admin screen)
+                // Password Field
                 Container(
                   decoration: BoxDecoration(
                     color: Colors.white10,
@@ -134,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: const TextStyle(color: Colors.white),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
-                        hintText: 'Password',
+                        hintText: 'Admin Password',
                         hintStyle: TextStyle(color: Colors.white54),
                       ),
                     ),
@@ -143,49 +143,26 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 const SizedBox(height: 30),
 
-                // Sign In Button
+                // Login Button
                 GestureDetector(
-                  onTap: _isLoading ? null : _handleLogin,
+                  onTap: _isLoading ? null : _handleAdminLogin,
                   child: Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.deepPurpleAccent,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
                       child: _isLoading
-                          ? const CircularProgressIndicator(
-                              color: Color.fromARGB(255, 16, 6, 51),
-                            )
+                          ? const CircularProgressIndicator(color: Colors.white)
                           : const Text(
-                              'Sign In',
+                              'Log In as Admin',
                               style: TextStyle(
-                                color: Color.fromARGB(255, 16, 6, 51),
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
                               ),
                             ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 25),
-
-                // Admin Switch Button
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const AdminLoginScreen(),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    'Admin Portal Login',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      decoration: TextDecoration.underline,
                     ),
                   ),
                 ),

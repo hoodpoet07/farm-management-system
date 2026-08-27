@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../database/database_helper.dart';
 import '../../models/user.dart';
+import '../dashboard/dashboard_screen.dart';
+import 'admin_login_screen.dart';
 
 class AdminUserManagementScreen extends StatefulWidget {
   const AdminUserManagementScreen({super.key});
@@ -10,7 +12,8 @@ class AdminUserManagementScreen extends StatefulWidget {
       _AdminUserManagementScreenState();
 }
 
-class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
+class _AdminUserManagementScreenState
+    extends State<AdminUserManagementScreen> {
   List<User> _users = [];
   bool _isLoading = true;
 
@@ -53,7 +56,7 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
               ),
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
-                initialValue: selectedRole,
+                value: selectedRole,
                 items: const [
                   DropdownMenuItem(value: 'user', child: Text('User')),
                   DropdownMenuItem(value: 'admin', child: Text('Admin')),
@@ -107,6 +110,20 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
         title: const Text('User Management'),
         backgroundColor: const Color.fromARGB(255, 5, 2, 59),
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout Admin',
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const AdminLoginScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromARGB(255, 5, 2, 59),
@@ -116,8 +133,42 @@ class _AdminUserManagementScreenState extends State<AdminUserManagementScreen> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-              itemCount: _users.length,
+              padding: const EdgeInsets.only(bottom: 80), // Padding for FAB space
+              itemCount: _users.length + 1, // Extra 1 item for the Enter App button
               itemBuilder: (context, index) {
+                // If it's the last item in the list, render the ENTER APP button right under the users
+                if (index == _users.length) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 12.0, vertical: 16.0),
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        minimumSize: const Size.fromHeight(50),
+                        backgroundColor: const Color.fromARGB(255, 5, 2, 59),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const DashboardScreen(),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.arrow_forward),
+                      label: const Text(
+                        'ENTER APP',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  );
+                }
+
+                // Render normal User Card items
                 final user = _users[index];
                 return Card(
                   margin:

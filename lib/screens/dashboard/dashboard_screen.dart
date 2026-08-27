@@ -6,6 +6,7 @@ import 'package:farm_management_system/screens/login/login.dart';
 import 'package:farm_management_system/screens/purchases/purchases_screen.dart';
 import 'package:farm_management_system/screens/reports/reports_screen.dart';
 import 'package:farm_management_system/screens/sales/sales_screen.dart';
+import '../note/notes_screen.dart';
 import 'package:farm_management_system/services/dashboard_service.dart';
 import 'package:flutter/material.dart';
 import '../../widgets/dashboard_card.dart';
@@ -70,197 +71,211 @@ class _DashboardScreenState extends State<DashboardScreen> {
       ),
 
       drawer: Drawer(
-        child: Column(
-          children: [
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  UserAccountsDrawerHeader(
-                    accountName: const Text("Farm Manager"), 
-                    accountEmail: const Text("Welcome Back"),
-                    currentAccountPicture: const CircleAvatar(
-                      child: Icon(
-                        Icons.agriculture,
-                        size: 40,
-                        color: Color.fromRGBO(16, 6, 51, 1),
+        child: SafeArea(
+          child: Column(
+            children: [
+              UserAccountsDrawerHeader(
+                      accountName: const Text("Farm Manager"), 
+                      accountEmail: const Text("Welcome Back"),
+                      currentAccountPicture: const CircleAvatar(
+                        child: Icon(
+                          Icons.agriculture,
+                          size: 40,
+                          color: Color.fromARGB(255, 22, 141, 26),
+                        ),
+                      ),
+                      decoration: const BoxDecoration(
+                        color: Colors.green,
                       ),
                     ),
-                    decoration: const BoxDecoration(
-                      color: Color.fromRGBO(16,6,51,1),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    ListTile(
+                      leading: const Icon(Icons.dashboard),
+                      title: const Text("Dashboard"),
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
                     ),
-                  ),
 
-                  ListTile(
-                    leading: const Icon(Icons.dashboard),
-                    title: const Text("Dashboard"),
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                  ),
+                    ListTile(
+                      leading: const Icon(Icons.shopping_cart),
+                      title: const Text("Purchases"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const PurchasesScreen()
+                          ),
+                        );
+                      },
+                    ),
 
-                  ListTile(
-                    leading: const Icon(Icons.shopping_cart),
-                    title: const Text("Purchases"),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PurchasesScreen()
-                        ),
-                      );
-                    },
-                  ),
+                    ListTile(
+                      leading: const Icon(Icons.attach_money),
+                      title: const Text("Sales"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const RecordSaleScreen()
+                          ),
+                        );
+                      },
+                    ),
 
-                  ListTile(
-                    leading: const Icon(Icons.attach_money),
-                    title: const Text("Sales"),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const RecordSaleScreen()
-                        ),
-                      );
-                    },
-                  ),
+                    ListTile(
+                      leading: const Icon(Icons.money_off),
+                      title: const Text("Expenses"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ExpensesScreen()
+                          ),
+                        );
+                      },
+                    ),
 
-                  ListTile(
-                    leading: const Icon(Icons.money_off),
-                    title: const Text("Expenses"),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ExpensesScreen()
-                        ),
-                      );
-                    },
-                  ),
+                    ListTile(
+                      leading: const Icon(Icons.egg),
+                      title: const Text("Chicken Batches"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ChickenStockScreen(),
+                          ),
+                        ).then((_) => _loadDashboard());
+                      },
+                    ),
 
-                  ListTile(
-                    leading: const Icon(Icons.egg),
-                    title: const Text("Chicken Batches"),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChickenStockScreen(),
-                        ),
-                      ).then((_) => _loadDashboard());
-                    },
-                  ),
+                    ListTile(
+                      leading: const Icon(Icons.grass),
+                      title: const Text("Feed Inventory"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const FeedInventoryScreen(),
+                          ),
+                        ).then((_) => _loadDashboard());
+                      },
+                    ),
 
-                  ListTile(
-                    leading: const Icon(Icons.grass),
-                    title: const Text("Feed Inventory"),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const FeedInventoryScreen(),
-                        ),
-                      ).then((_) => _loadDashboard());
-                    },
-                  ),
+                    ListTile(
+                      leading: const Icon(Icons.bar_chart),
+                      title: const Text("Reports"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ReportsScreen(),
+                          ),
+                        ).then((_) => _loadDashboard());
+                      },
+                    ),
 
-                  ListTile(
-                    leading: const Icon(Icons.bar_chart),
-                    title: const Text("Reports"),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ReportsScreen(),
-                        ),
-                      ).then((_) => _loadDashboard());
-                    },
-                  ),
+                    ListTile(
+                      leading: const Icon(Icons.psychology),
+                      title: const Text("AI"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const ChatScreen(),
+                          ),
+                        ).then((_) => _loadDashboard());
+                      },
+                    ),
 
-                  ListTile(
-                    leading: const Icon(Icons.psychology),
-                    title: const Text("AI"),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChatScreen(),
-                        ),
-                      ).then((_) => _loadDashboard());
-                    },
-                  ),
+                    ListTile(
+                      leading: const Icon(Icons.note),
+                      title: const Text("NOTES"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const NotesScreen(),
+                          ),
+                        ).then((_) => _loadDashboard());
+                      },
+                    ),
 
-                  ListTile(
-                    leading: const Icon(Icons.logout),
-                    title: const Text("LOGOUT"),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const LoginScreen(),
-                        ),
-                      ).then((_) => _loadDashboard());
-                    },
-                  ),
-                ],
+                    ListTile(
+                      leading: const Icon(Icons.logout),
+                      title: const Text("LOGOUT"),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        ).then((_) => _loadDashboard());
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            // FIXED AREA
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0, left: 16.0, right: 16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Divider(color: Color.fromARGB(255, 3, 53, 5), thickness: 0.5),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "FULECH AI",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color.fromARGB(255, 3, 53, 5),
-                          letterSpacing: 1.5,
+              // FIXED AREA
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 20.0, left: 16.0, right: 16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Divider(color: Color.fromARGB(255, 3, 53, 5), thickness: 0.5),
+                        const SizedBox(height: 8),
+                        const Text(
+                          "FULECH AI",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Color.fromARGB(255, 3, 53, 5),
+                            letterSpacing: 1.5,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.chat, color: Colors.green),
-                            iconSize: 28,
-                            onPressed: () async {
-                              final Uri whatsappUrl = Uri.parse("https://wa.me/+263710809945"); 
-                              if (await canLaunchUrl(whatsappUrl)) {
-                                await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
-                              }
-                            },
-                            tooltip: 'WhatsApp Support',
-                          ),
-                          const SizedBox(width: 30),
-                          IconButton(
-                            icon: const Icon(Icons.phone, color: Color.fromARGB(255, 3, 53, 5)),
-                            iconSize: 28,
-                            onPressed: () async {
-                              final Uri phoneUrl = Uri.parse("tel:+263710809945"); 
-                              if (await canLaunchUrl(phoneUrl)) {
-                                await launchUrl(phoneUrl, mode: LaunchMode.externalApplication);
-                              }
-                            },
-                            tooltip: 'Call Support',
-                          ),
-                        ],
-                      ),
-                    ],
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.chat, color: Colors.green),
+                              iconSize: 28,
+                              onPressed: () async {
+                                final Uri whatsappUrl = Uri.parse("https://wa.me/+263710809945"); 
+                                if (await canLaunchUrl(whatsappUrl)) {
+                                  await launchUrl(whatsappUrl, mode: LaunchMode.externalApplication);
+                                }
+                              },
+                              tooltip: 'WhatsApp Support',
+                            ),
+                            const SizedBox(width: 30),
+                            IconButton(
+                              icon: const Icon(Icons.phone, color: Color.fromARGB(255, 3, 53, 5)),
+                              iconSize: 28,
+                              onPressed: () async {
+                                final Uri phoneUrl = Uri.parse("tel:+263710809945"); 
+                                if (await canLaunchUrl(phoneUrl)) {
+                                  await launchUrl(phoneUrl, mode: LaunchMode.externalApplication);
+                                }
+                              },
+                              tooltip: 'Call Support',
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
 
@@ -301,7 +316,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     icon: Icons.egg,
                     title: "Chickens",
                     value: summary?.totalChickens.toString() ?? "0",
-                    color: Colors.green,
+                    color: Colors.orange,
                     
                   ),
 
@@ -309,7 +324,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     icon: Icons.shopping_cart,
                     title: "Purchases",
                     value: "\$${summary?.totalPurchases != null ? summary!.totalPurchases.toStringAsFixed(2) : "0.00"}",
-                    color: Colors.green,
+                    color: Colors.blue,
                   ),
 
                   DashboardCard(
@@ -323,7 +338,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     icon: Icons.money_off,
                     title: "Expenses",
                     value: "\$${summary?.totalExpenses != null ? summary!.totalExpenses.toStringAsFixed(2) : "0.00"}",
-                    color: Colors.green,
+                    color: Colors.deepOrange,
                   ),
                 ],
               ),

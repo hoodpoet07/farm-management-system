@@ -155,10 +155,43 @@ class DatabaseHelper{
         dateAdded TEXT NOT NULL
       )
 ''');
-
+  await db.execute('''
+    CREATE TABLE notes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      title TEXT NOT NULL,
+      content TEXT NOT NULL,
+      category TEXT DEFAULT 'General', -- e.g., 'Action Item', 'Future Development', 'Maintenance'
+      isCompleted INTEGER DEFAULT 0, -- 0 for active, 1 for done
+      createdAt TEXT NOT NULL
+    )
+''');
 
   }
   
+  Future<int> insertNote(Map<String, dynamic> row) async{
+    final db = await instance.database;
+    return await db.insert('notes',row);
+  }
+
+  Future<List<Map<String, dynamic>>> getNotes() async{
+    final db = await instance.database;
+    return await db.query('notes',orderBy: 'isCompleted ASC,id DESC');
+  }
+
+  Future<int> updateNoteStatus(int id,bool isCompleted)async{
+    final db = await instance.database;
+    return await  db.update(
+      'notes',
+      {'isCompleted': isCompleted ? 1 : 0},
+      where: 'id=?',
+      whereArgs: [id],
+    );
+  }
+
+  Future<int> deleteNote(int id) async{
+      final db = await instance.database;
+      return await db.delete('notes',where: 'id = ?',whereArgs: [id]);
+  }
   Future<int> insertSale(Sale sale) async {
   final db = await database;
   return await db.insert('sales', sale.toMap());
