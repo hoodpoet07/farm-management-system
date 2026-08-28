@@ -56,7 +56,7 @@ class _AdminUserManagementScreenState
               ),
               const SizedBox(height: 10),
               DropdownButtonFormField<String>(
-                value: selectedRole,
+                initialValue: selectedRole,
                 items: const [
                   DropdownMenuItem(value: 'user', child: Text('User')),
                   DropdownMenuItem(value: 'admin', child: Text('Admin')),
